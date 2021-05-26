@@ -6,6 +6,11 @@ using UnityEngine;
 public class NoteController : MonoBehaviour {
     private bool noteAlreadyMissed = false;
 
+    public int Pos {
+        get;
+        set;
+    } = 0;
+
     private ScoreManager ScoreManager;
     private NotesManager NotesManager;
 
@@ -61,7 +66,7 @@ public class NoteController : MonoBehaviour {
         NotesManager.DestroyNote(this);
     }
 
-    public int noteFallSpeed = 50;
+    private int noteFallSpeed = 10;
 
     void UpdatePosition() {
         transform.Translate(Vector3.back * noteFallSpeed * Time.deltaTime);

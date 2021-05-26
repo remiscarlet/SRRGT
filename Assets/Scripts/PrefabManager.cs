@@ -11,9 +11,16 @@ using UnityEngine.EventSystems;
 /// NOT, <c>PrefabManager.DamageText</c>
 /// </summary>
 public class PrefabManager : MonoBehaviour {
+    public GameObject noteObject;
+
     public GameObject accuracyMissText;
     public GameObject accuracyGoodText;
     public GameObject accuracyPerfectText;
+
+
+    public GameObject NoteObject {
+        get => noteObject;
+    }
 
     public GameObject AccuracyMissText {
         get => accuracyMissText;
