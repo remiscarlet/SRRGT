@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
  using System.ComponentModel;
+ using JetBrains.Annotations;
  using UnityEditor;
 using UnityEngine;
 
@@ -62,8 +63,25 @@ public class NotesManager : MonoBehaviour {
         Destroy(note.gameObject);
     }
 
-    List<NoteController> GetAllJudgeableNotes() {
-        return spawnedNotes.FindAll(note => note.gameObject.layer == Layers.JudgeableNotes);
+    List<NoteController> GetAllJudgeableNotesForPos(int notePos) {
+        return spawnedNotes.FindAll(note => note.gameObject.layer == Layers.JudgeableNotes && note.Pos == notePos);
+    }
+
+    /// <summary>
+    /// This or GetAllJudgeableNotesForPos?
+    /// Normally one keypress should never judge more than one note at a time. If that's the case
+    /// do we ever need to return more than the "most relevant" note when judging accuracy?
+    /// </summary>
+    /// <param name="notePos"></param>
+    /// <returns></returns>
+    [CanBeNull]
+    NoteController GetNextJudgeableNoteForPos(int notePos) {
+        List<NoteController> notes = GetAllJudgeableNotesForPos(notePos);
+        if (notes.Count == 0) {
+            return null;
+        }
+
+        return notes[0];
     }
 
     // Update is called once per frame
@@ -90,38 +108,48 @@ public class NotesManager : MonoBehaviour {
 
         NoteController noteController = note.GetComponent<NoteController>();
         noteController.Pos = pos;
-        Debug.Log($"Spawning note: {noteController.Pos}");
         spawnedNotes.Add(noteController);
     }
 
     void ProcessInput() {
         foreach (KeyCode key in notePosToKeyCodeMapping) {
             if (Input.GetKeyDown(key)) {
-                foreach (NoteController note in GetAllJudgeableNotes()) {
-                    JudgeHit(note, key);
+                NoteController? note = GetNextJudgeableNoteForPos(KeyCodeToNotePos(key));
+                if (note != null) {
+                    JudgeHit(note);
                 }
             }
         }
     }
 
-    KeyCode TranslateNotePosToKeyCode(int notePos) {
+    KeyCode NotePosToKeyCode(int notePos) {
+        if (notePos >= notePosToKeyCodeMapping.Count) {
+            throw new Exception($"Got notePos value greater than configured number of keys! Got: {notePos}");
+        }
         Debug.Log($"Notepos is {notePos}");
         return notePosToKeyCodeMapping[notePos];
     }
 
-    void JudgeHit(NoteController note, KeyCode pressedKey) {
+    int KeyCodeToNotePos(KeyCode key) {
+        if (!notePosToKeyCodeMapping.Contains(key)) {
+            throw new Exception($"Tried to get notepos of invalid key. Got: {key}");
+        }
+        return notePosToKeyCodeMapping.IndexOf(key);
+    }
+
+    void JudgeHit(NoteController note) {
+        AudioManager.PlayHitSound();
+
         // TODO: Make timing based, not distance based
-        if (TranslateNotePosToKeyCode(note.Pos) == pressedKey) {
-            float distToCenter = Math.Abs(note.transform.position.z);
-            if (distToCenter <= 0.25f) {
-                note.RegisterHitPerfect();
-            }
-            else if (distToCenter <= 0.75f) {
-                note.RegisterHitGood();
-            }
-            else {
-                note.RegisterHitMiss();
-            }
+        float distToCenter = Math.Abs(note.transform.position.z);
+        if (distToCenter <= 0.25f) {
+            note.RegisterHitPerfect();
+        }
+        else if (distToCenter <= 0.75f) {
+            note.RegisterHitGood();
+        }
+        else {
+            note.RegisterHitMiss();
         }
     }
 }

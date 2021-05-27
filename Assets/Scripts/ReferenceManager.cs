@@ -18,6 +18,7 @@ public class ReferenceManager : MonoBehaviour {
 
         prefabs = GetComponent<PrefabManager>();
         scoreManager = GetComponent<ScoreManager>();
+        //audioManager = GameObject.Find("AudioMnager").GetComponent<AudioManager>();
 
         cameraObject = GameObject.Find("Main Camera");
         notesManagerComponent = gameObject.GetComponent<NotesManager>();
@@ -32,6 +33,7 @@ public class ReferenceManager : MonoBehaviour {
 
     [System.NonSerialized] public PrefabManager prefabs;
     [System.NonSerialized] public ScoreManager scoreManager;
+    [System.NonSerialized] public AudioManager audioManager;
     [System.NonSerialized] public GameObject cameraObject;
     [System.NonSerialized] public NotesManager notesManagerComponent;
 
@@ -47,8 +49,12 @@ public class ReferenceManager : MonoBehaviour {
         get => instance.prefabs;
     }
 
-    public static ScoreManager ScoreManager{
+    public static ScoreManager ScoreManager {
         get => instance.scoreManager;
+    }
+
+    public static AudioManager AudioManager {
+        get => instance.audioManager;
     }
 
     public static GameObject CameraObject {
