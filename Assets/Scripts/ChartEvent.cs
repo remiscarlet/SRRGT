@@ -2,15 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
 
 public class ChartEvent {
     public enum Types {
-        Note,
-        BPMChange,
-        numKeysChange
+        Note = 0,
+        BPMChange = 1,
+        NumKeysChange = 2
     }
+
+    [CanBeNull] private GameObject note;
 
     public ChartEvent(Types eventType, int? beatNum, double? playTime) {
         if (beatNum == null && playTime == null) {
