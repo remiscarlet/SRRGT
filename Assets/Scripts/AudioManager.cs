@@ -30,9 +30,14 @@ public class AudioManager : MonoBehaviour {
         instance.sfxAudioSource.PlayOneShot(instance.hitSoundSFX, instance.volume);
     }
 
-    public static double ConvertTimeToBeatAsFloat(double time, int bpm) {
+    public static double ConvertTimeToBeatAsDouble(double time, int bpm) {
         double secPerBeat = 60.0 / bpm;
         return time / secPerBeat + 1; // + 1 because 0-index vs 1-index (the 1st beat is at time 0.0)
+    }
+
+    public static double ConvertBeatToTimeAsDouble(int beatNum, int bpm) {
+        double secPerBeat = 60.0 / bpm;
+        return beatNum * secPerBeat;
     }
 
     void Awake() {

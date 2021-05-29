@@ -85,7 +85,7 @@ public class NotesManager : MonoBehaviour {
     }
 
     public void SpawnChartEvent(ChartEvent chartEvent) {
-        SpawnNote(chartEvent.NotePos);
+        SpawnNote(chartEvent.NotePos, chartEvent.PlayTime);
     }
 
     // Update is called once per frame
@@ -99,19 +99,20 @@ public class NotesManager : MonoBehaviour {
         for (int i = 0; i < numKeys; i++) {
             KeyCode key = spawnButtons[i];
             if (Input.GetKeyDown(key)) {
-                SpawnNote(i);
+                SpawnNote(i, AudioSettings.dspTime + 0.5); // Hard code target time of "0.5 seconds later"
             }
         }
     }
 
     private Quaternion fwdRotation = Quaternion.Euler(new Vector3(0, 0, 90));
 
-    void SpawnNote(int pos) {
+    void SpawnNote(int pos, double playTime) {
         Vector3 position = noteSpawnPositions[pos];
         GameObject note = Instantiate(ReferenceManager.Prefabs.NoteObject, position, fwdRotation, ReferenceManager.NotesHierarchyTransform);
 
         NoteController noteController = note.GetComponent<NoteController>();
         noteController.Pos = pos;
+        noteController.InitializeTargetTime(playTime);
         spawnedNotes.Add(noteController);
     }
 
@@ -144,6 +145,7 @@ public class NotesManager : MonoBehaviour {
     }
 
     void JudgeHit(NoteController note) {
+        Debug.Log($"Registering hit at: beat:{AudioManager.ConvertTimeToBeatAsDouble(ReferenceManager.AudioManager.CurrTrackTime, ReferenceManager.GameController.currChart.BPM)}, time:{ReferenceManager.AudioManager.CurrTrackTime}");
         AudioManager.PlayHitSound();
 
         // TODO: Make timing based, not distance based

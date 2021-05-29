@@ -28,14 +28,14 @@ public class Chart {
     }
 
     public void PlayChart() {
-        double currTime = audioManager.CurrTrackTime;
-        double currBeat = AudioManager.ConvertTimeToBeatAsFloat(currTime, BPM);
+        double currTime = ReferenceManager.AudioManager.CurrTrackTime;
+        double currBeat = AudioManager.ConvertTimeToBeatAsDouble(currTime, BPM);
 
         // TODO: God, this is so inefficient. Clean it up.
         List<ChartEvent> playedEvents = new List<ChartEvent>();
         foreach (ChartEvent chartEvent in chartEvents) {
             if (chartEvent.BeatNum - LeadDuration <= currBeat) {
-                Debug.Log($"Spawning chartEvent at `beat:{currBeat}` => {chartEvent} - currTime:{currTime}, BPM:{BPM}");
+                Debug.Log($"Spawning chartEvent at `beat:{currBeat}` => {chartEvent} - currTime:{currTime}, BPM:{BPM} - Target beat: {chartEvent.BeatNum}");
                 ReferenceManager.NotesManager.SpawnChartEvent(chartEvent);
                 playedEvents.Add(chartEvent);
             }

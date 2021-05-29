@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEditor.UI;
 using UnityEngine;
 
@@ -20,6 +22,15 @@ public class NoteController : MonoBehaviour {
         NotesManager = ReferenceManager.NotesManager;
     }
 
+    private double targetTime = -1.0;
+    private double spawnedTime = -1.0;
+    private float spawnZOffset = -1.0f;
+    public void InitializeTargetTime(double targetTime) {
+        this.targetTime = targetTime;
+        this.spawnedTime = ReferenceManager.AudioManager.CurrTrackTime;
+        this.spawnZOffset = transform.position.z;
+    }
+
     public void RegisterHitMiss() {
         ScoreManager.RegisterMiss(transform);
         SelfDestroy();
@@ -37,6 +48,10 @@ public class NoteController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        if (targetTime == -1.0) {
+            return;
+        }
+
         UpdatePosition();
 
         if (NoteWasMissed() && ! noteAlreadyMissed) {
@@ -66,11 +81,21 @@ public class NoteController : MonoBehaviour {
         NotesManager.DestroyNote(this);
     }
 
-    private int noteFallSpeed = 15;
-
     void UpdatePosition() {
         if (ReferenceManager.AudioManager.IsPlayingTrack) {
-            transform.Translate(Vector3.back * noteFallSpeed * Time.deltaTime);
+            if (spawnedTime == -1.0 || targetTime == -1.0) {
+                throw new Exception("Tried updating note event position before initializing!");
+            }
+
+            double now = ReferenceManager.AudioManager.CurrTrackTime;
+            double timeToPlayTime = now - spawnedTime;
+            double percentToPlayTime = timeToPlayTime / (targetTime - spawnedTime);
+
+            float zPos = spawnZOffset * (float) percentToPlayTime;
+
+            Vector3 newPos = new Vector3(transform.position.x, transform.position.y, zPos);
+            Debug.Log($"Moving note {this} to newPos: {newPos} with zPos:{zPos}, pcntToPlayTime:{percentToPlayTime}, timeToPlayTime:{timeToPlayTime}, spawnedTime:{spawnedTime}, targetTime:{targetTime}, spawnZOffset:{spawnZOffset}");
+            transform.position = newPos;
         }
     }
 

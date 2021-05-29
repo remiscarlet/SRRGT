@@ -16,6 +16,7 @@ public class ReferenceManager : MonoBehaviour {
     void Awake() {
         instance = this;
 
+        gameController = GetComponent<GameController>();
         prefabs = GetComponent<PrefabManager>();
         scoreManager = GetComponent<ScoreManager>();
         uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
@@ -32,6 +33,7 @@ public class ReferenceManager : MonoBehaviour {
         hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
     }
 
+    [System.NonSerialized] public GameController gameController;
     [System.NonSerialized] public PrefabManager prefabs;
     [System.NonSerialized] public ScoreManager scoreManager;
     [System.NonSerialized] public AudioManager audioManager;
@@ -47,6 +49,9 @@ public class ReferenceManager : MonoBehaviour {
     [System.NonSerialized] public GameObject hitPlaneInnerObject;
     [System.NonSerialized] public GameObject hitPlaneCenterObject;
 
+    public static GameController GameController {
+        get => instance.gameController;
+    }
     public static PrefabManager Prefabs {
         get => instance.prefabs;
     }

@@ -68,7 +68,7 @@ public class ChartEvent {
     public int BeatNum {
         set {
             beatNum = value;
-            playTime = CalculatePlayTimeByBeat(beatNum);
+            playTime = AudioManager.ConvertBeatToTimeAsDouble(beatNum, bpm);
         }
         get {
             if (beatNum == -1) {
@@ -81,7 +81,7 @@ public class ChartEvent {
     public double PlayTime {
         set {
             playTime = value;
-            BeatNum = (int) Math.Round(AudioManager.ConvertTimeToBeatAsFloat(playTime, bpm)); // Make a 'beat' class with conversions etc? Also makes easier for submetric rhythms
+            beatNum = (int) Math.Round(AudioManager.ConvertTimeToBeatAsDouble(playTime, bpm)); // Make a 'beat' class with conversions etc? Also makes easier for submetric rhythms
         }
         get {
             if (playTime == -1.0) {
@@ -90,17 +90,5 @@ public class ChartEvent {
 
             return playTime;
         }
-    }
-
-    /// <summary>
-    /// Does NOT account for start offset.
-    ///
-    /// All ChartEvent objects should be in the context of an already playing chart - ie offsets are accounted for already.
-    /// </summary>
-    /// <param name="beatNum"></param>
-    /// <returns></returns>
-    private double CalculatePlayTimeByBeat(int beatNum) {
-
-        return 0.0;
     }
 }
