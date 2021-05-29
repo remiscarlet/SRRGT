@@ -22,6 +22,7 @@
 
 
 ## Chart format
+```
 <eventtype:int>,<eventdata:data>
     where
     <eventtype> == 0:
@@ -53,6 +54,7 @@
 <eventtype:int=0>,<keynum>[-<keynum>...],<isByBeat:bool=0>,<playTime:double>
 <eventtype:int=1>,<newBPM:int>,<isByBeat:bool=1>,<beatnum:int>
 <eventtype:int=1>,<newBPM:int>,<isByBeat:bool=0>,<playTime:double>
+```
 
 ### Theme
 
