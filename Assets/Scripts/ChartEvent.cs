@@ -13,9 +13,13 @@ public class ChartEvent {
         NumKeysChange = 2
     }
 
+
+    private Chart chart;
     [CanBeNull] private GameObject note;
 
-    public ChartEvent(Types eventType, int? beatNum, double? playTime) {
+    public ChartEvent(Chart chart, Types eventType, int? beatNum, double? playTime) {
+        this.chart = chart;
+
         if (beatNum == null && playTime == null) {
             throw new Exception("Cannot initialize ChartNote without either beatNum or playTime. Must provide one!");
         }
@@ -49,7 +53,6 @@ public class ChartEvent {
         }
         bpm = newBPM;
         isInitialized = true;
-
     }
 
     public void InitializeNumKeysChange(int newNumKeys) {
@@ -78,6 +81,7 @@ public class ChartEvent {
     public double PlayTime {
         set {
             playTime = value;
+            BeatNum = (int) Math.Round(AudioManager.ConvertTimeToBeatAsFloat(playTime, bpm)); // Make a 'beat' class with conversions etc? Also makes easier for submetric rhythms
         }
         get {
             if (playTime == -1.0) {

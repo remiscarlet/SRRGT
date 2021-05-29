@@ -19,7 +19,7 @@ public class ChartReader {
     /// </summary>
     /// <param name="chartPath"></param>
     /// <exception cref="Exception"></exception>
-    public void ReadAndParseChart(string chartPath) {
+    public Chart InstantiateChart(string chartPath) {
         StreamReader sr = new StreamReader(chartPath);
 
         String title = "", artist = "";
@@ -80,6 +80,8 @@ public class ChartReader {
 
             line = sr.ReadLine();
         }
+
+        return chart;
     }
 
     private void ParseChartLine(string line, Chart chart) {
@@ -102,8 +104,7 @@ public class ChartReader {
             }
 
             foreach (int notePos in notePositions) {
-                ChartEvent chartEvent = InstantiateNoteEvent(eventType, notePos, beatNum, playTime);
-                chart.AddChartEvent(chartEvent);
+                InstantiateNoteEvent(chart, eventType, notePos, beatNum, playTime);
             }
         } else if (eventType == ChartEvent.Types.BPMChange) {
             throw new Exception("Unimplemented");
@@ -112,14 +113,14 @@ public class ChartReader {
         }
     }
 
-    private ChartEvent InstantiateNoteEvent(ChartEvent.Types eventType, int notePos, int? beatNum, double? playTime) {
-        ChartEvent chartEvent = new ChartEvent(eventType, beatNum, playTime);
+    private void InstantiateNoteEvent(Chart chart, ChartEvent.Types eventType, int notePos, int? beatNum, double? playTime) {
+        ChartEvent chartEvent = new ChartEvent(chart, eventType, beatNum, playTime);
         if (eventType == ChartEvent.Types.Note) {
             chartEvent.InitializeNote(notePos);
         } else {
             throw new Exception("Unimplemented exception");
         }
 
-        return chartEvent;
+        chart.AddChartEvent(chartEvent);
     }
 }

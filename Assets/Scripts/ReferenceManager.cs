@@ -18,10 +18,11 @@ public class ReferenceManager : MonoBehaviour {
 
         prefabs = GetComponent<PrefabManager>();
         scoreManager = GetComponent<ScoreManager>();
-        //audioManager = GameObject.Find("AudioMnager").GetComponent<AudioManager>();
+        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
 
         cameraObject = GameObject.Find("Main Camera");
-        notesManagerComponent = gameObject.GetComponent<NotesManager>();
+        notesManager = gameObject.GetComponent<NotesManager>();
         hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
         notesHierarchyTransform = GameObject.Find("Notes").transform;
 
@@ -34,8 +35,9 @@ public class ReferenceManager : MonoBehaviour {
     [System.NonSerialized] public PrefabManager prefabs;
     [System.NonSerialized] public ScoreManager scoreManager;
     [System.NonSerialized] public AudioManager audioManager;
+    [System.NonSerialized] public UIManager uiManager;
     [System.NonSerialized] public GameObject cameraObject;
-    [System.NonSerialized] public NotesManager notesManagerComponent;
+    [System.NonSerialized] public NotesManager notesManager;
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
     [System.NonSerialized] public Transform notesHierarchyTransform;
@@ -57,12 +59,16 @@ public class ReferenceManager : MonoBehaviour {
         get => instance.audioManager;
     }
 
+    public static UIManager UIManager {
+        get => instance.uiManager;
+    }
+
     public static GameObject CameraObject {
         get => instance.cameraObject;
     }
 
-    public static NotesManager NotesManagerComponent {
-        get => instance.notesManagerComponent;
+    public static NotesManager NotesManager {
+        get => instance.notesManager;
     }
 
     public static Transform HitResultsHierarchyTransform {

@@ -8,6 +8,11 @@ public class Chart {
     public int NumKeys { get; private set; }
     public int BPM { get; private set; }
     public double LeadOffset { get; private set; }
+    public double LeadDuration { get; private set; } // In future have speed modifiers modify in get;
+
+    private AudioManager audioManager;
+
+    private List<ChartEvent> chartEvents;
 
     public Chart(string title, string artist, int numKeys, int bpm, double leadOffset) {
         Title = title;
@@ -16,10 +21,31 @@ public class Chart {
         BPM = bpm;
         LeadOffset = leadOffset;
 
+        LeadDuration = 2.0;
+
         chartEvents = new List<ChartEvent>();
+        audioManager = ReferenceManager.AudioManager;
     }
 
-    private List<ChartEvent> chartEvents;
+    public void PlayChart() {
+        double currTime = audioManager.CurrTrackTime;
+        double currBeat = AudioManager.ConvertTimeToBeatAsFloat(currTime, BPM);
+
+        // TODO: God, this is so inefficient. Clean it up.
+        List<ChartEvent> playedEvents = new List<ChartEvent>();
+        foreach (ChartEvent chartEvent in chartEvents) {
+            if (chartEvent.BeatNum - LeadDuration <= currBeat) {
+                Debug.Log($"Spawning chartEvent at `beat:{currBeat}` => {chartEvent} - currTime:{currTime}, BPM:{BPM}");
+                ReferenceManager.NotesManager.SpawnChartEvent(chartEvent);
+                playedEvents.Add(chartEvent);
+            }
+        }
+
+        foreach (ChartEvent chartEvent in playedEvents) {
+            chartEvents.Remove(chartEvent);
+        }
+    }
+
 
     /// <summary>
     /// Eh...? This or AddChartEvent()

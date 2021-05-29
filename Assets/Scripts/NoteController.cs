@@ -17,7 +17,7 @@ public class NoteController : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         ScoreManager = ReferenceManager.ScoreManager;
-        NotesManager = ReferenceManager.NotesManagerComponent;
+        NotesManager = ReferenceManager.NotesManager;
     }
 
     public void RegisterHitMiss() {
@@ -66,10 +66,12 @@ public class NoteController : MonoBehaviour {
         NotesManager.DestroyNote(this);
     }
 
-    private int noteFallSpeed = 10;
+    private int noteFallSpeed = 15;
 
     void UpdatePosition() {
-        transform.Translate(Vector3.back * noteFallSpeed * Time.deltaTime);
+        if (ReferenceManager.AudioManager.IsPlayingTrack) {
+            transform.Translate(Vector3.back * noteFallSpeed * Time.deltaTime);
+        }
     }
 
     void OnTriggerEnter(Collider other) {

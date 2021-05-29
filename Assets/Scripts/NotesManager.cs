@@ -10,7 +10,7 @@ public class NotesManager : MonoBehaviour {
     private float boardWidth = 10.0f;
     private int numKeys = 7;
 
-    private int spawnDistance = 50;
+    private int spawnDistance = 30; // TODO: Need to tie this and NoteController fall speed together with audio manager
 
     private List<KeyCode> notePosToKeyCodeMapping;
     private List<Vector3> noteSpawnPositions;
@@ -84,6 +84,10 @@ public class NotesManager : MonoBehaviour {
         return notes[0];
     }
 
+    public void SpawnChartEvent(ChartEvent chartEvent) {
+        SpawnNote(chartEvent.NotePos);
+    }
+
     // Update is called once per frame
     void Update() {
         SpawnNotes();
@@ -112,11 +116,13 @@ public class NotesManager : MonoBehaviour {
     }
 
     void ProcessInput() {
-        foreach (KeyCode key in notePosToKeyCodeMapping) {
-            if (Input.GetKeyDown(key)) {
-                NoteController? note = GetNextJudgeableNoteForPos(KeyCodeToNotePos(key));
-                if (note != null) {
-                    JudgeHit(note);
+        if (ReferenceManager.AudioManager.IsPlayingTrack) {
+            foreach (KeyCode key in notePosToKeyCodeMapping) {
+                if (Input.GetKeyDown(key)) {
+                    NoteController? note = GetNextJudgeableNoteForPos(KeyCodeToNotePos(key));
+                    if (note != null) {
+                        JudgeHit(note);
+                    }
                 }
             }
         }
