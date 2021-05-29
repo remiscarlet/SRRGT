@@ -6,12 +6,12 @@ using System.IO;
 using UnityEngine.PlayerLoop;
 
 public class ChartReader {
-    public const string TITLE_KEY = "title:"; // Note the colons.
-    public const string ARTIST_KEY = "artist:";
-    public const string NUMKEYS_KEY = "numkeys:";
-    public const string BPM_KEY = "bpm:";
-    public const string LEAD_KEY = "lead:"; // "Start offset"
-    public const string CHART_KEY = "chart:";
+    public const string TITLE_KEY = "title";
+    public const string ARTIST_KEY = "artist";
+    public const string NUMKEYS_KEY = "numkeys";
+    public const string BPM_KEY = "bpm";
+    public const string LEAD_KEY = "lead"; // "Start offset"
+    public const string CHART_KEY = "chart";
 
     /// <summary>
     /// This function is mega gross.
@@ -34,27 +34,33 @@ public class ChartReader {
                 throw new Exception("Hit EOF of chart file before finished initializing!");
             }
 
-            switch (line) {
+            string[] line_parts = line.Split(':');
+            string line_key = line_parts[0], line_content = line_parts[1].Trim();
+            switch (line_key) {
                 case TITLE_KEY:
-                    title = line.Remove(0, TITLE_KEY.Length + 1); // +1 to account for space after colon
+                    title = line_content;
                     break;
                 case ARTIST_KEY:
-                    artist = line.Remove(0, ARTIST_KEY.Length + 1);
+                    artist = line_content;
                     break;
                 case NUMKEYS_KEY:
-                    numKeys = int.Parse(line.Remove(0, NUMKEYS_KEY.Length + 1));
+                    numKeys = int.Parse(line_content);
                     break;
                 case BPM_KEY:
-                    bpm = int.Parse(line.Remove(0, BPM_KEY.Length + 1));
+                    bpm = int.Parse(line_content);
                     break;
                 case LEAD_KEY:
-                    lead = double.Parse(line.Remove(0, LEAD_KEY.Length + 1));
+                    lead = double.Parse(line_content);
                     break;
                 case CHART_KEY:
+                    if (title == "" || artist == "" || numKeys == -1 || bpm == -1 || lead == -1.0) {
+                        throw new Exception("Got to CHART_KEY without initializing all other fields first!");
+                    }
+                    Debug.Log($"title: {title}, artist: {artist}, numKeys: {numKeys}, bpm: {bpm}, lead: {lead}");
                     hitChartDataDelimiter = true;
                     break;
                 default:
-                    throw new Exception($"Got to a line that we couldn't parse! Got: `{line}`");
+                    throw new Exception($"Got to a line that we couldn't parse! Got: `{line}` => `{line_key}`");
             }
         }
 
@@ -64,14 +70,20 @@ public class ChartReader {
             throw new Exception("How is line null???");
         }
 
-        // Chart notes from here
+        // At this point 'line' should still be set to CHART_KEY. Move to next line.
+        line = sr.ReadLine();
         while (line != null) {
+            if (line[0] != '#') {
+                // Allow lines starting with octothorp be considered 'comments'
+                ParseChartLine(line, chart);
+            }
+
             line = sr.ReadLine();
-            ParseChartLine(line, chart);
         }
     }
 
     private void ParseChartLine(string line, Chart chart) {
+        Debug.Log($"Parsing line: {line}");
         string[] parts = line.Split(',');
 
         ChartEvent.Types eventType = (ChartEvent.Types) int.Parse(parts[0]);
@@ -79,7 +91,8 @@ public class ChartReader {
             string notePosString = parts[1];
             int[] notePositions = Array.ConvertAll(notePosString.Split('-'), int.Parse);
 
-            bool isByBeat = Convert.ToBoolean(parts[2]);
+            // Debug.Log($"Attempting to convert {parts[2]} into a boolean...");
+            bool isByBeat = Convert.ToBoolean(int.Parse(parts[2]));
             int? beatNum = null;
             double? playTime = null;
             if (isByBeat) {

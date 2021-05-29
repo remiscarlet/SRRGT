@@ -63,7 +63,7 @@ public class AudioManager : MonoBehaviour {
             if (trackStartTime == -1.0) {
                 trackStartTime = AudioSettings.dspTime;
             }
-            Debug.Log($"dspTime is: {trackStartTime}");
+            Debug.Log($"trackStartTime(dspTime) is: {trackStartTime}");
 
 
         }
