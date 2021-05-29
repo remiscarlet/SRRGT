@@ -37,7 +37,7 @@ public class AudioManager : MonoBehaviour {
 
     public static double ConvertBeatToTimeAsDouble(int beatNum, int bpm) {
         double secPerBeat = 60.0 / bpm;
-        return beatNum * secPerBeat;
+        return (beatNum - 1) * secPerBeat;
     }
 
     void Awake() {

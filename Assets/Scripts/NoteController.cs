@@ -29,6 +29,7 @@ public class NoteController : MonoBehaviour {
         this.targetTime = targetTime;
         this.spawnedTime = ReferenceManager.AudioManager.CurrTrackTime;
         this.spawnZOffset = transform.position.z;
+        Debug.Log($"Initializing NoteController with: targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}");
     }
 
     public void RegisterHitMiss() {
@@ -91,7 +92,7 @@ public class NoteController : MonoBehaviour {
             double timeToPlayTime = now - spawnedTime;
             double percentToPlayTime = timeToPlayTime / (targetTime - spawnedTime);
 
-            float zPos = spawnZOffset * (float) percentToPlayTime;
+            float zPos = spawnZOffset * (float) (1 - percentToPlayTime);
 
             Vector3 newPos = new Vector3(transform.position.x, transform.position.y, zPos);
             Debug.Log($"Moving note {this} to newPos: {newPos} with zPos:{zPos}, pcntToPlayTime:{percentToPlayTime}, timeToPlayTime:{timeToPlayTime}, spawnedTime:{spawnedTime}, targetTime:{targetTime}, spawnZOffset:{spawnZOffset}");

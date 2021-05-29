@@ -27,6 +27,7 @@ public class ChartEvent {
             throw new Exception("Cannot initialize ChartNote with both beatNum and playTime. Must choose one!");
         }
 
+        bpm = chart.BPM;
         if (beatNum != null) {
             BeatNum = (int) beatNum; // I always hate explicit casts rather than relying on typechecking but should be safe in this case.
         } else if (playTime != null) {
@@ -69,6 +70,7 @@ public class ChartEvent {
         set {
             beatNum = value;
             playTime = AudioManager.ConvertBeatToTimeAsDouble(beatNum, bpm);
+            Debug.Log($"Setting ChartEvent.BeatNum: {value} - Conversion to playTime is: {playTime} using bpm:{bpm}");
         }
         get {
             if (beatNum == -1) {
