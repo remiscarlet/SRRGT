@@ -52,7 +52,7 @@ public class ScoreManager : MonoBehaviour {
     }
 
     private void RegisterNote(Transform noteTransform, GameObject textPrefab) {
-        ReferenceManager.UIManager.UpdateStatsUI();
+        ReferenceManager.GameplayUIManager.UpdateStatsUI();
         SpawnAccuracyText(noteTransform, textPrefab);
     }
 

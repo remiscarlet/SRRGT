@@ -4,15 +4,15 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour {
+public class GameplayUIManager : MonoBehaviour {
 
-    private bool gameplayUiActive;
-    private bool GameplayUIActive {
-        get { return gameplayUiActive; }
+    private bool uiActive;
+    private bool UIActive {
+        get { return uiActive; }
         set {
             loadingPanel.SetActive(value);
             statsPanel.SetActive(value);
-            gameplayUiActive = value;
+            uiActive = value;
         }
     }
 
@@ -25,7 +25,7 @@ public class UIManager : MonoBehaviour {
 
     private GameObject pausePanel;
     private Button resumeButton;
-    private Button quitButton;
+    private Button mainMenuButton;
 
     // Start is called before the first frame update
     void Start() {
@@ -38,22 +38,23 @@ public class UIManager : MonoBehaviour {
 
         pausePanel = transform.Find("PausePanel").gameObject;
         resumeButton = pausePanel.transform.Find("Resume").GetComponent<Button>();
-        quitButton = pausePanel.transform.Find("Quit").GetComponent<Button>();
+        mainMenuButton = pausePanel.transform.Find("MainMenu").GetComponent<Button>();
 
-        resumeButton.onClick.AddListener(ReferenceManager.GameManager.TogglePauseState);
+        resumeButton.onClick.AddListener(ReferenceManager.GameplayManager.TogglePauseState);
+        mainMenuButton.onClick.AddListener(ReferenceManager.GameSceneManager.LoadMainMenuScene);
     }
 
     // Update is called once per frame
     void Update() {
         // TODO: Probably want this to be an explicit method call in the future?
         if (ReferenceManager.AudioManager.IsPlayingTrack) {
-            if (!GameplayUIActive) {
-                GameplayUIActive = true;
+            if (!UIActive) {
+                UIActive = true;
             }
 
             loadingBar.value = ReferenceManager.AudioManager.GetTrackPercentage();
-        } else if (GameplayUIActive) {
-            GameplayUIActive = false;
+        } else if (UIActive) {
+            UIActive = false;
         }
     }
 

@@ -145,7 +145,7 @@ public class NotesManager : MonoBehaviour {
     }
 
     void JudgeHit(NoteController note) {
-        Debug.Log($"Registering hit at: beat:{AudioManager.ConvertTimeToBeatAsDouble(ReferenceManager.AudioManager.CurrTrackTime, ReferenceManager.GameManager.CurrChart.BPM)}, time:{ReferenceManager.AudioManager.CurrTrackTime}");
+        Debug.Log($"Registering hit at: beat:{AudioManager.ConvertTimeToBeatAsDouble(ReferenceManager.AudioManager.CurrTrackTime, ReferenceManager.GameplayManager.CurrChart.BPM)}, time:{ReferenceManager.AudioManager.CurrTrackTime}");
         AudioManager.PlayHitSound();
 
         // TODO: Make timing based, not distance based

@@ -23,7 +23,8 @@ public class BoardManager : MonoBehaviour {
     public void InitializeNoteBoundaries(int numKeys) {
         float rowWidth = (float) boardWidth / numKeys;
         Vector3 position;
-        for (int idx = 0; idx < numKeys; idx++) {
+        for (int idx = 0; idx < numKeys + 1; idx++) {
+            // Num boundaries = numKeys + 1. For far right boundary.
             position = new Vector3(idx * rowWidth, 0.0f, 0.0f);
             GameObject boundary = Instantiate(noteBoundaryPrefab, position, noteBoundaryRot, environmentHierarchyTransform);
 
@@ -32,8 +33,6 @@ public class BoardManager : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
-    {
-
+    void Update() {
     }
 }

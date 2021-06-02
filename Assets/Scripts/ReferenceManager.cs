@@ -1,7 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using Scene = UnityEditor.SearchService.Scene;
 
 /// <summary>
 /// This is a singleton class that houses references to a bunch of commonly used
@@ -16,22 +20,35 @@ public class ReferenceManager : MonoBehaviour {
     void Awake() {
         instance = this;
 
-        hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
-        notesHierarchyTransform = GameObject.Find("Notes").transform;
-        environmentHierarchyTransform = GameObject.Find("Environment").transform;
+        string sceneName = SceneManager.GetActiveScene().name;
+        switch (sceneName) {
+            case GameSceneManager.MainMenuScene:
+                mainMenuManager = GetComponent<MainMenuManager>();
+                gameSceneManager = GetComponent<GameSceneManager>();
+                mainMenuUiManager = GameObject.Find("Canvas").GetComponent<MainMenuUIManager>();
+                break;
+            case GameSceneManager.GameplayScene:
+                hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
+                notesHierarchyTransform = GameObject.Find("Notes").transform;
+                environmentHierarchyTransform = GameObject.Find("Environment").transform;
 
-        cameraObject = GameObject.Find("Main Camera");
-        hitPlaneOuterObject = environmentHierarchyTransform.Find("HitPlaneOuter").gameObject;
-        hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
-        hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
+                cameraObject = GameObject.Find("Main Camera");
+                hitPlaneOuterObject = environmentHierarchyTransform.Find("HitPlaneOuter").gameObject;
+                hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
+                hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
 
-        gameManager = GetComponent<GameManager>();
-        prefabs = GetComponent<PrefabManager>();
-        notesManager = gameObject.GetComponent<NotesManager>();
-        scoreManager = GetComponent<ScoreManager>();
-        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
-        boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
+                gameplayManager = GetComponent<GameplayManager>();
+                gameSceneManager = GetComponent<GameSceneManager>();
+                prefabs = GetComponent<PrefabManager>();
+                notesManager = gameObject.GetComponent<NotesManager>();
+                scoreManager = GetComponent<ScoreManager>();
+                gameplayUiManager = GameObject.Find("Canvas").GetComponent<GameplayUIManager>();
+                audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+                boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
+                break;
+            default:
+                throw new Exception($"Got invalid scene name! Got: {sceneName}");
+        }
     }
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
@@ -43,11 +60,14 @@ public class ReferenceManager : MonoBehaviour {
     [System.NonSerialized] public GameObject hitPlaneInnerObject;
     [System.NonSerialized] public GameObject hitPlaneCenterObject;
 
-    [System.NonSerialized] public GameManager gameManager;
+    [System.NonSerialized] public GameplayManager gameplayManager;
+    [System.NonSerialized] public MainMenuManager mainMenuManager;
+    [System.NonSerialized] public GameSceneManager gameSceneManager;
     [System.NonSerialized] public PrefabManager prefabs;
     [System.NonSerialized] public NotesManager notesManager;
     [System.NonSerialized] public ScoreManager scoreManager;
-    [System.NonSerialized] public UIManager uiManager;
+    [System.NonSerialized] public GameplayUIManager gameplayUiManager;
+    [System.NonSerialized] public MainMenuUIManager mainMenuUiManager;
     [System.NonSerialized] public AudioManager audioManager;
     [System.NonSerialized] public BoardManager boardManager;
 
@@ -83,8 +103,14 @@ public class ReferenceManager : MonoBehaviour {
     /// <summary>
     /// Managers
     /// </summary>
-    public static GameManager GameManager {
-        get => instance.gameManager;
+    public static GameplayManager GameplayManager {
+        get => instance.gameplayManager;
+    }
+    public static MainMenuManager MainMenuManager{
+        get => instance.mainMenuManager;
+    }
+    public static GameSceneManager GameSceneManager {
+        get => instance.gameSceneManager;
     }
     public static PrefabManager Prefabs {
         get => instance.prefabs;
@@ -95,8 +121,11 @@ public class ReferenceManager : MonoBehaviour {
     public static ScoreManager ScoreManager {
         get => instance.scoreManager;
     }
-    public static UIManager UIManager {
-        get => instance.uiManager;
+    public static GameplayUIManager GameplayUIManager {
+        get => instance.gameplayUiManager;
+    }
+    public static MainMenuUIManager MainMenuUIManager {
+        get => instance.mainMenuUiManager;
     }
     public static AudioManager AudioManager {
         get => instance.audioManager;

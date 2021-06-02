@@ -57,7 +57,7 @@ public class AudioManager : MonoBehaviour {
 
     public bool IsPlayingTrack { get; private set; } = false;
     public void ToggleTrackMusic() {
-        if (!IsPlayingTrack && ReferenceManager.GameManager.CurrChart == null) {
+        if (!IsPlayingTrack && ReferenceManager.GameplayManager.CurrChart == null) {
             throw new Exception("Tried to toggle music state while CurrChart was null! Set CurrChart first. ");
         }
         IsPlayingTrack = !IsPlayingTrack;

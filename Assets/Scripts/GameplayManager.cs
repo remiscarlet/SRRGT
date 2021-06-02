@@ -8,13 +8,12 @@ using UnityEngine.PlayerLoop;
 /// <summary>
 /// What's the purpose of this controller? Could I move everything elsewhere? Different name?
 /// </summary>
-public class GameManager : MonoBehaviour {
+public class GameplayManager : MonoBehaviour {
     private ChartReader chartReader;
     private AudioManager audioManager;
 
     private string chartPath = @"D:\Unity\SRRGT\Assets\chart1\chart1.txt"; // TODO: Obvi don't hardcode this
 
-    public bool IsGameplayActive { private set; get; } // Eh... could kinda be replaced by active scene in future?
     public bool IsPaused { private set; get; }
 
     [CanBeNull] public Chart CurrChart { private set; get; }
@@ -23,6 +22,8 @@ public class GameManager : MonoBehaviour {
     void Start() {
         chartReader = new ChartReader();
         audioManager = ReferenceManager.AudioManager;
+
+        InitializeChart(chartPath);
     }
 
     public void InitializeChart(string chartPath) {
@@ -35,18 +36,11 @@ public class GameManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (IsGameplayActive) {
-            if (!IsPaused) {
-                CurrChart.PlayChart();
-            }
-            if (Input.GetKeyDown(KeyCode.P)) {
-                TogglePauseState();
-            }
-        } else {
-            if (Input.GetKeyDown(KeyCode.Return) && !audioManager.IsPlayingTrack) {
-                InitializeChart(chartPath);
-                IsGameplayActive = true;
-            }
+        if (!IsPaused) {
+            CurrChart.PlayChart();
+        }
+        if (Input.GetKeyDown(KeyCode.P)) {
+            TogglePauseState();
         }
     }
 
@@ -54,6 +48,6 @@ public class GameManager : MonoBehaviour {
         IsPaused = !IsPaused;
 
         ReferenceManager.AudioManager.ToggleTrackMusic();
-        ReferenceManager.UIManager.TogglePauseScreen();
+        ReferenceManager.GameplayUIManager.TogglePauseScreen();
     }
 }

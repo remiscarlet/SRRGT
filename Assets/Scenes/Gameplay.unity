@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 705507994}
+  m_Sun: {fileID: 0}
   m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 75116465aa4b84b469ed9745bfb49a5c, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -257,11 +257,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 21574814}
   m_CullTransparentMesh: 1
---- !u!4 &98878797 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-  m_PrefabInstance: {fileID: 1434164221}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &208726799
 GameObject:
   m_ObjectHideFlags: 0
@@ -1345,7 +1340,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Quit
+  m_text: Main Menu
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -1687,7 +1682,7 @@ GameObject:
   - component: {fileID: 1047375240}
   - component: {fileID: 1047375239}
   m_Layer: 5
-  m_Name: Quit
+  m_Name: MainMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2333,71 +2328,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &1434164221
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 1544795659}
-    m_Modifications:
-    - target: {fileID: 2965356165611906423, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_Name
-      value: Note
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_RootOrder
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.18610477
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 0.653016
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -4.283
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.015
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 4.319963
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7414179289574834127, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 90
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
 --- !u!1 &1544795658
 GameObject:
   m_ObjectHideFlags: 0
@@ -2424,8 +2354,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 98878797}
+  m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -2773,6 +2702,7 @@ GameObject:
   - component: {fileID: 1769336196}
   - component: {fileID: 1769336198}
   - component: {fileID: 1769336199}
+  - component: {fileID: 1769336200}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2859,6 +2789,19 @@ MonoBehaviour:
   accuracyMissText: {fileID: 1755054120424495765, guid: 321f85769a824f34b8a067a53e4ff263, type: 3}
   accuracyGoodText: {fileID: 6853403765881760333, guid: 60b2bfd11809a4447a83b657afa677ea, type: 3}
   accuracyPerfectText: {fileID: 4015569004605412251, guid: d1eba2d99aaa86f4694ad050b0c3cdbf, type: 3}
+--- !u!114 &1769336200
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1769336193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fb227ef1d61b1e46ad2358495a410c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lightingSettings: {fileID: 4890085278179872738, guid: 75116465aa4b84b469ed9745bfb49a5c, type: 2}
 --- !u!1 &1816362967
 GameObject:
   m_ObjectHideFlags: 0
