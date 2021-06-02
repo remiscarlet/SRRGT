@@ -7,8 +7,8 @@ public class Chart {
     public string Artist { get; private set; }
     public int NumKeys { get; private set; }
     public int BPM { get; private set; }
-    public double LeadOffset { get; private set; }
-    public double LeadDuration { get; private set; } // In future have speed modifiers modify in get;
+    public double LeadOffset { get; private set; } // Offset of first beat in music
+    public double LeadDuration { get; private set; } // Duration of time before music starts. Ie, gives time for first chartevent lead in. In future have speed modifiers modify in get;
 
     private AudioManager audioManager;
 

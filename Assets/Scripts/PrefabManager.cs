@@ -13,6 +13,8 @@ using UnityEngine.EventSystems;
 public class PrefabManager : MonoBehaviour {
     public GameObject noteObject;
 
+    public GameObject noteBoundaryLine;
+
     public GameObject accuracyMissText;
     public GameObject accuracyGoodText;
     public GameObject accuracyPerfectText;
@@ -20,6 +22,10 @@ public class PrefabManager : MonoBehaviour {
 
     public GameObject NoteObject {
         get => noteObject;
+    }
+
+    public GameObject NoteBoundaryLine {
+        get => noteBoundaryLine;
     }
 
     public GameObject AccuracyMissText {

@@ -56,8 +56,15 @@ public class AudioManager : MonoBehaviour {
     }
 
     public bool IsPlayingTrack { get; private set; } = false;
-    void ToggleTrackMusic() {
+    public void ToggleTrackMusic() {
+        if (!IsPlayingTrack && ReferenceManager.GameController.CurrChart == null) {
+            throw new Exception("Tried to toggle music state while CurrChart was null! Set CurrChart first. ");
+        }
         IsPlayingTrack = !IsPlayingTrack;
+    }
+
+    public float GetTrackPercentage() {
+        return (float) CurrTrackTime / trackAudioSource.clip.length;
     }
 
     void Update() {

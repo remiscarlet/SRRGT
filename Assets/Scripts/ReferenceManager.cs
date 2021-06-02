@@ -18,37 +18,44 @@ public class ReferenceManager : MonoBehaviour {
 
         gameController = GetComponent<GameController>();
         prefabs = GetComponent<PrefabManager>();
-        scoreManager = GetComponent<ScoreManager>();
-        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
-        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
 
-        cameraObject = GameObject.Find("Main Camera");
-        notesManager = gameObject.GetComponent<NotesManager>();
         hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
         notesHierarchyTransform = GameObject.Find("Notes").transform;
-
         environmentHierarchyTransform = GameObject.Find("Environment").transform;
+
+        cameraObject = GameObject.Find("Main Camera");
         hitPlaneOuterObject = environmentHierarchyTransform.Find("HitPlaneOuter").gameObject;
         hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
         hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
+
+        notesManager = gameObject.GetComponent<NotesManager>();
+        scoreManager = GetComponent<ScoreManager>();
+        uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
+        audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+        boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
     }
 
     [System.NonSerialized] public GameController gameController;
     [System.NonSerialized] public PrefabManager prefabs;
-    [System.NonSerialized] public ScoreManager scoreManager;
-    [System.NonSerialized] public AudioManager audioManager;
-    [System.NonSerialized] public UIManager uiManager;
-    [System.NonSerialized] public GameObject cameraObject;
-    [System.NonSerialized] public NotesManager notesManager;
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
     [System.NonSerialized] public Transform notesHierarchyTransform;
-
     [System.NonSerialized] public Transform environmentHierarchyTransform;
+
+    [System.NonSerialized] public GameObject cameraObject;
     [System.NonSerialized] public GameObject hitPlaneOuterObject;
     [System.NonSerialized] public GameObject hitPlaneInnerObject;
     [System.NonSerialized] public GameObject hitPlaneCenterObject;
 
+    [System.NonSerialized] public NotesManager notesManager;
+    [System.NonSerialized] public ScoreManager scoreManager;
+    [System.NonSerialized] public UIManager uiManager;
+    [System.NonSerialized] public AudioManager audioManager;
+    [System.NonSerialized] public BoardManager boardManager;
+
+    /// <summary>
+    /// Etc...?
+    /// </summary>
     public static GameController GameController {
         get => instance.gameController;
     }
@@ -56,38 +63,25 @@ public class ReferenceManager : MonoBehaviour {
         get => instance.prefabs;
     }
 
-    public static ScoreManager ScoreManager {
-        get => instance.scoreManager;
-    }
-
-    public static AudioManager AudioManager {
-        get => instance.audioManager;
-    }
-
-    public static UIManager UIManager {
-        get => instance.uiManager;
-    }
-
-    public static GameObject CameraObject {
-        get => instance.cameraObject;
-    }
-
-    public static NotesManager NotesManager {
-        get => instance.notesManager;
-    }
-
+    /// <summary>
+    /// Transforms
+    /// </summary>
     public static Transform HitResultsHierarchyTransform {
         get => instance.hitResultsHierarchyTransform;
     }
-
     public static Transform NotesHierarchyTransform {
         get => instance.notesHierarchyTransform;
     }
-
     public static Transform EnvironmentHierarchyTransform {
         get => instance.environmentHierarchyTransform;
     }
 
+    /// <summary>
+    /// GameObjects
+    /// </summary>
+    public static GameObject CameraObject {
+        get => instance.cameraObject;
+    }
     public static GameObject HitPlaneOuterObject {
         get => instance.hitPlaneOuterObject;
     }
@@ -96,5 +90,24 @@ public class ReferenceManager : MonoBehaviour {
     }
     public static GameObject HitPlaneCenterObject {
         get => instance.hitPlaneCenterObject;
+    }
+
+    /// <summary>
+    /// Managers
+    /// </summary>
+    public static NotesManager NotesManager {
+        get => instance.notesManager;
+    }
+    public static ScoreManager ScoreManager {
+        get => instance.scoreManager;
+    }
+    public static UIManager UIManager {
+        get => instance.uiManager;
+    }
+    public static AudioManager AudioManager {
+        get => instance.audioManager;
+    }
+    public static BoardManager BoardManager {
+        get => instance.boardManager;
     }
 }

@@ -15,8 +15,15 @@ public class UIManager : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
+        if (ReferenceManager.AudioManager.IsPlayingTrack) {
+            if (!loadingPanel.activeSelf) {
+                loadingPanel.SetActive(true);
+            }
 
+            loadingBar.value = ReferenceManager.AudioManager.GetTrackPercentage();
+        } else if (loadingPanel.activeSelf) {
+            loadingPanel.SetActive(false);
+        }
     }
 }
