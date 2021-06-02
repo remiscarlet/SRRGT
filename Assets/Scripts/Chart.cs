@@ -34,10 +34,13 @@ public class Chart {
         // TODO: God, this is so inefficient. Clean it up.
         List<ChartEvent> playedEvents = new List<ChartEvent>();
         foreach (ChartEvent chartEvent in chartEvents) {
+            Debug.Log($"BeatNum: {chartEvent.BeatNum} - {LeadDuration} <= {currBeat}");
+
             if (chartEvent.BeatNum - LeadDuration <= currBeat) {
                 Debug.Log($"Spawning chartEvent at `beat:{currBeat}` => {chartEvent} - currTime:{currTime}, BPM:{BPM} - Target beat: {chartEvent.BeatNum}");
                 ReferenceManager.NotesManager.SpawnChartEvent(chartEvent);
                 playedEvents.Add(chartEvent);
+                Debug.Log($"Spawned: {chartEvent}");
             }
         }
 

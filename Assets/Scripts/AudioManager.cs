@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TreeEditor;
@@ -52,12 +53,11 @@ public class AudioManager : MonoBehaviour {
         bgmAudioSource = audioSources[2];
 
         trackAudioSource.clip = trackClip;
-        Debug.Log($"trackClip: {trackClip}");
     }
 
     public bool IsPlayingTrack { get; private set; } = false;
     public void ToggleTrackMusic() {
-        if (!IsPlayingTrack && ReferenceManager.GameController.CurrChart == null) {
+        if (!IsPlayingTrack && ReferenceManager.GameManager.CurrChart == null) {
             throw new Exception("Tried to toggle music state while CurrChart was null! Set CurrChart first. ");
         }
         IsPlayingTrack = !IsPlayingTrack;
@@ -68,10 +68,6 @@ public class AudioManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.P)) {
-            ToggleTrackMusic();
-        }
-
         if (IsPlayingTrack) {
             double now = AudioSettings.dspTime;
             if (lastTrackSnapshot == -1.0) {
@@ -80,6 +76,8 @@ public class AudioManager : MonoBehaviour {
 
             CurrTrackTime += now - lastTrackSnapshot;
             lastTrackSnapshot = now;
+        } else {
+            lastTrackSnapshot = -1.0;
         }
 
         if (IsPlayingTrack) {
@@ -88,7 +86,7 @@ public class AudioManager : MonoBehaviour {
                 trackAudioSource.Play();
                 Debug.Log($"Playing trackAudioSource - {trackAudioSource} - {trackAudioSource.clip}");
             }
-        } else {
+        } else if (trackAudioSource.isPlaying) {
             trackAudioSource.Pause();
             Debug.Log("Pausing trackAudioSource");
         }

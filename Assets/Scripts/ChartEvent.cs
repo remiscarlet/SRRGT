@@ -29,7 +29,7 @@ public class ChartEvent {
 
         bpm = chart.BPM;
         if (beatNum != null) {
-            BeatNum = (int) beatNum; // I always hate explicit casts rather than relying on typechecking but should be safe in this case.
+            BeatNum = (int) beatNum; // I always hate explicit casts for nullables rather than relying on typechecking :-/
         } else if (playTime != null) {
             PlayTime = (double) playTime;
         }

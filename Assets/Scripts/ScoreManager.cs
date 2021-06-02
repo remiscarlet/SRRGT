@@ -5,7 +5,19 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour {
     private Transform hitResultsHierarchy;
 
-    private int score;
+    public int Score { private set; get; }
+
+    public float Accuracy {
+        get {
+            int totalNotes = perfects + goods + misses;
+            if (totalNotes == 0) {
+                return 0.0f;
+            }
+
+            float accScore = perfects * 1.0f + goods * 0.5f;
+            return accScore / totalNotes * 100;
+        }
+    }
 
     private int perfects;
     private int goods;
@@ -15,30 +27,33 @@ public class ScoreManager : MonoBehaviour {
     void Start() {
         hitResultsHierarchy = ReferenceManager.HitResultsHierarchyTransform;
 
-        score = 0;
+        Score = 0;
         perfects = 0;
         goods = 0;
         misses = 0;
     }
 
     public void RegisterMiss(Transform noteTransform) {
-        score += 25;
+        Score += 25;
         misses += 1;
-
-        SpawnAccuracyText(noteTransform, ReferenceManager.Prefabs.AccuracyMissText);
-        Debug.Log("Registered a miss.");
+        RegisterNote(noteTransform, ReferenceManager.Prefabs.AccuracyMissText);
     }
 
     public void RegisterGood(Transform noteTransform) {
-        score += 50;
+        Score += 50;
         goods += 1;
-        SpawnAccuracyText(noteTransform, ReferenceManager.Prefabs.AccuracyGoodText);
+        RegisterNote(noteTransform, ReferenceManager.Prefabs.AccuracyGoodText);
     }
 
     public void RegisterPerfect(Transform noteTransform) {
-        score += 150;
+        Score += 150;
         perfects += 1;
-        SpawnAccuracyText(noteTransform, ReferenceManager.Prefabs.AccuracyPerfectText);
+        RegisterNote(noteTransform, ReferenceManager.Prefabs.AccuracyPerfectText);
+    }
+
+    private void RegisterNote(Transform noteTransform, GameObject textPrefab) {
+        ReferenceManager.UIManager.UpdateStatsUI();
+        SpawnAccuracyText(noteTransform, textPrefab);
     }
 
     private Quaternion fwdRotation = Quaternion.Euler(Vector3.zero);

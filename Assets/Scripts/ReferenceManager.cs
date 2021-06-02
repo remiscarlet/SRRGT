@@ -16,9 +16,6 @@ public class ReferenceManager : MonoBehaviour {
     void Awake() {
         instance = this;
 
-        gameController = GetComponent<GameController>();
-        prefabs = GetComponent<PrefabManager>();
-
         hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
         notesHierarchyTransform = GameObject.Find("Notes").transform;
         environmentHierarchyTransform = GameObject.Find("Environment").transform;
@@ -28,15 +25,14 @@ public class ReferenceManager : MonoBehaviour {
         hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
         hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
 
+        gameManager = GetComponent<GameManager>();
+        prefabs = GetComponent<PrefabManager>();
         notesManager = gameObject.GetComponent<NotesManager>();
         scoreManager = GetComponent<ScoreManager>();
         uiManager = GameObject.Find("Canvas").GetComponent<UIManager>();
         audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
         boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
     }
-
-    [System.NonSerialized] public GameController gameController;
-    [System.NonSerialized] public PrefabManager prefabs;
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
     [System.NonSerialized] public Transform notesHierarchyTransform;
@@ -47,21 +43,13 @@ public class ReferenceManager : MonoBehaviour {
     [System.NonSerialized] public GameObject hitPlaneInnerObject;
     [System.NonSerialized] public GameObject hitPlaneCenterObject;
 
+    [System.NonSerialized] public GameManager gameManager;
+    [System.NonSerialized] public PrefabManager prefabs;
     [System.NonSerialized] public NotesManager notesManager;
     [System.NonSerialized] public ScoreManager scoreManager;
     [System.NonSerialized] public UIManager uiManager;
     [System.NonSerialized] public AudioManager audioManager;
     [System.NonSerialized] public BoardManager boardManager;
-
-    /// <summary>
-    /// Etc...?
-    /// </summary>
-    public static GameController GameController {
-        get => instance.gameController;
-    }
-    public static PrefabManager Prefabs {
-        get => instance.prefabs;
-    }
 
     /// <summary>
     /// Transforms
@@ -95,6 +83,12 @@ public class ReferenceManager : MonoBehaviour {
     /// <summary>
     /// Managers
     /// </summary>
+    public static GameManager GameManager {
+        get => instance.gameManager;
+    }
+    public static PrefabManager Prefabs {
+        get => instance.prefabs;
+    }
     public static NotesManager NotesManager {
         get => instance.notesManager;
     }

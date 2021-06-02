@@ -95,7 +95,7 @@ public class NoteController : MonoBehaviour {
             float zPos = spawnZOffset * (float) (1 - percentToPlayTime);
 
             Vector3 newPos = new Vector3(transform.position.x, transform.position.y, zPos);
-            Debug.Log($"Moving note {this} to newPos: {newPos} with zPos:{zPos}, pcntToPlayTime:{percentToPlayTime}, timeToPlayTime:{timeToPlayTime}, spawnedTime:{spawnedTime}, targetTime:{targetTime}, spawnZOffset:{spawnZOffset}");
+            // Debug.Log($"Moving note {this} to newPos: {newPos} with zPos:{zPos}, pcntToPlayTime:{percentToPlayTime}, timeToPlayTime:{timeToPlayTime}, spawnedTime:{spawnedTime}, targetTime:{targetTime}, spawnZOffset:{spawnZOffset}");
             transform.position = newPos;
         }
     }
