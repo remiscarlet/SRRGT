@@ -13,26 +13,44 @@ public class ChartEvent {
         NumKeysChange = 2
     }
 
-
     private Chart chart;
+    public ChartBeat Beat { private set; get; }
+    public Types EventType { private set; get; }
+
+    public int NotePos { set; get; } = -1;
+
+    private int bpm = -1;
+    public int BPM {
+        private set { bpm = value; }
+        get {
+            if (bpm == -1) {
+                throw new Exception("No BPM has been configured for this ChartEvent!");
+            }
+            return bpm;
+        }
+    } // Unintuitively, bpm doesn't actually affect the "beat" so it's not a part of it.
+
     [CanBeNull] private GameObject note;
 
-    public ChartEvent(Chart chart, Types eventType, int? beatNum, double? playTime) {
+    public ChartEvent(Chart chart, Types eventType, int beatNum, int beatSubdiv, int beatSubdivIdx) {
         this.chart = chart;
+        EventType = eventType;
+        Beat = new ChartBeat(chart, beatNum, beatSubdiv, beatSubdivIdx);
+    }
 
-        if (beatNum == null && playTime == null) {
-            throw new Exception("Cannot initialize ChartNote without either beatNum or playTime. Must provide one!");
-        }
-        if (beatNum != null && playTime != null) {
-            throw new Exception("Cannot initialize ChartNote with both beatNum and playTime. Must choose one!");
+    public ChartEvent(Chart chart, Types eventType, double playTime) {
+        this.chart = chart;
+        EventType = eventType;
+        Beat = new ChartBeat(chart, playTime);
+    }
+
+    public string ToString() {
+        if (NotePos != -1) {
+            return $"ChartEvent[type:{EventType}, beat:{Beat.ToString()}, NotePos:{NotePos}]";
+        } else {
+            return $"ChartEvent[type:{EventType}, beat:{Beat.ToString()}]";
         }
 
-        bpm = chart.BPM;
-        if (beatNum != null) {
-            BeatNum = (int) beatNum; // I always hate explicit casts for nullables rather than relying on typechecking :-/
-        } else if (playTime != null) {
-            PlayTime = (double) playTime;
-        }
     }
 
     private bool isInitialized = false;
@@ -52,45 +70,11 @@ public class ChartEvent {
         if (isInitialized) {
             throw new Exception("Trying to initialize a note that's already been initialized!");
         }
-        bpm = newBPM;
+        BPM = newBPM;
         isInitialized = true;
     }
 
     public void InitializeNumKeysChange(int newNumKeys) {
         throw new Exception("Unimplemented");
-    }
-
-    public int NotePos { set; get; }
-
-    private int bpm = -1;
-    private int beatNum = -1;
-    private double playTime = -1.0; // As in "the time at which to 'play' this note" in seconds. Use AudioSettings.dspTime
-
-    public int BeatNum {
-        set {
-            beatNum = value;
-            playTime = AudioManager.ConvertBeatToTimeAsDouble(beatNum, bpm);
-            Debug.Log($"Setting ChartEvent.BeatNum: {value} - Conversion to playTime is: {playTime} using bpm:{bpm}");
-        }
-        get {
-            if (beatNum == -1) {
-                throw new Exception("Tried to get BeatNum before it was set. How is this possible?");
-            }
-            return beatNum;
-        }
-    }
-
-    public double PlayTime {
-        set {
-            playTime = value;
-            beatNum = (int) Math.Round(AudioManager.ConvertTimeToBeatAsDouble(playTime, bpm)); // Make a 'beat' class with conversions etc? Also makes easier for submetric rhythms
-        }
-        get {
-            if (playTime == -1.0) {
-                throw new Exception("Tried to get PlayTime before it was set. How is this possible?");
-            }
-
-            return playTime;
-        }
     }
 }

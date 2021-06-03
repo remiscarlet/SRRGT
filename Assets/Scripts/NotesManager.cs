@@ -85,7 +85,7 @@ public class NotesManager : MonoBehaviour {
     }
 
     public void SpawnChartEvent(ChartEvent chartEvent) {
-        SpawnNote(chartEvent.NotePos, chartEvent.PlayTime);
+        SpawnNote(chartEvent.NotePos, chartEvent.Beat);
     }
 
     // Update is called once per frame
@@ -105,6 +105,10 @@ public class NotesManager : MonoBehaviour {
     }
 
     private Quaternion fwdRotation = Quaternion.Euler(new Vector3(0, 0, 90));
+
+    void SpawnNote(int pos, ChartBeat beat) {
+        SpawnNote(pos, beat.PlayTime);
+    }
 
     void SpawnNote(int pos, double playTime) {
         Vector3 position = noteSpawnPositions[pos];

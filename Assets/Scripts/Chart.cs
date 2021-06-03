@@ -8,11 +8,13 @@ public class Chart {
     public int NumKeys { get; private set; }
     public int BPM { get; private set; }
     public double LeadOffset { get; private set; } // Offset of first beat in music
-    public double LeadDuration { get; private set; } // Duration of time before music starts. Ie, gives time for first chartevent lead in. In future have speed modifiers modify in get;
+    public double NoteLeadDurationInSec { get; private set; } // Duration of time before music starts. Ie, gives time for first chartevent lead in. In future have speed modifiers modify in get;
 
     private AudioManager audioManager;
 
     private List<ChartEvent> chartEvents;
+
+    public List<ChartEvent> BPMChanges { private set; get; } // Should guarantee order by ascending beat
 
     public Chart(string title, string artist, int numKeys, int bpm, double leadOffset) {
         Title = title;
@@ -21,23 +23,27 @@ public class Chart {
         BPM = bpm;
         LeadOffset = leadOffset;
 
-        LeadDuration = 2.0;
+        NoteLeadDurationInSec = 1.0;
 
+        BPMChanges = new List<ChartEvent>();
         chartEvents = new List<ChartEvent>();
         audioManager = ReferenceManager.AudioManager;
+
+        ChartEvent initialBPM = new ChartEvent(this, ChartEvent.Types.BPMChange, 1);
+        initialBPM.InitializeBPMChange(bpm);
+        BPMChanges.Add(initialBPM);
     }
 
     public void PlayChart() {
         double currTime = ReferenceManager.AudioManager.CurrTrackTime;
-        double currBeat = AudioManager.ConvertTimeToBeatAsDouble(currTime, BPM);
 
         // TODO: God, this is so inefficient. Clean it up.
         List<ChartEvent> playedEvents = new List<ChartEvent>();
         foreach (ChartEvent chartEvent in chartEvents) {
-            Debug.Log($"BeatNum: {chartEvent.BeatNum} - {LeadDuration} <= {currBeat}");
+            //Debug.Log($"BeatNum: {chartEvent.Beat.AsFloat()} - {LeadDuration} <= {currTime}");
 
-            if (chartEvent.BeatNum - LeadDuration <= currBeat) {
-                Debug.Log($"Spawning chartEvent at `beat:{currBeat}` => {chartEvent} - currTime:{currTime}, BPM:{BPM} - Target beat: {chartEvent.BeatNum}");
+            if (chartEvent.Beat.PlayTime - NoteLeadDurationInSec <= currTime) {
+                Debug.Log($"Spawning chartEvent at `currTme:{currTime}` => {chartEvent.ToString()} - BPM:{BPM} - Target beat: {chartEvent.Beat.ToString()}");
                 ReferenceManager.NotesManager.SpawnChartEvent(chartEvent);
                 playedEvents.Add(chartEvent);
                 Debug.Log($"Spawned: {chartEvent}");
@@ -60,5 +66,9 @@ public class Chart {
 
     public void AddChartEvent(ChartEvent chartEvent) {
         chartEvents.Add(chartEvent);
+
+        if (chartEvent.EventType == ChartEvent.Types.BPMChange) {
+            BPMChanges.Add(chartEvent);
+        }
     }
 }

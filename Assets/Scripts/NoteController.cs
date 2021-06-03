@@ -32,6 +32,10 @@ public class NoteController : MonoBehaviour {
         Debug.Log($"Initializing NoteController with: targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}");
     }
 
+    public string ToString() {
+        return $"NoteController[targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}]";
+    }
+
     public void RegisterHitMiss() {
         ScoreManager.RegisterMiss(transform);
         SelfDestroy();
@@ -84,8 +88,8 @@ public class NoteController : MonoBehaviour {
 
     void UpdatePosition() {
         if (ReferenceManager.AudioManager.IsPlayingTrack) {
-            if (spawnedTime == -1.0 || targetTime == -1.0) {
-                throw new Exception("Tried updating note event position before initializing!");
+            if (targetTime == -1.0) {
+                throw new Exception($"Tried updating note event position before initializing! {ToString()}");
             }
 
             double now = ReferenceManager.AudioManager.CurrTrackTime;

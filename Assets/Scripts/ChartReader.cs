@@ -75,7 +75,11 @@ public class ChartReader {
         while (line != null) {
             if (line[0] != '#') {
                 // Allow lines starting with octothorp be considered 'comments'
-                ParseChartLine(line, chart);
+                try {
+                    ParseChartLine(line, chart);
+                } catch (Exception ex) {
+                    throw new Exception($"Failed to correctly parse line: {line}", ex);
+                }
             }
 
             line = sr.ReadLine();
@@ -94,17 +98,28 @@ public class ChartReader {
             int[] notePositions = Array.ConvertAll(notePosString.Split('-'), int.Parse);
 
             // Debug.Log($"Attempting to convert {parts[2]} into a boolean...");
-            bool isByBeat = Convert.ToBoolean(int.Parse(parts[2]));
-            int? beatNum = null;
+
+            int? beatNum = null, beatSubdiv = null, beatSubdivIdx = null;
             double? playTime = null;
+
+            bool isByBeat = Convert.ToBoolean(int.Parse(parts[2]));
             if (isByBeat) {
                 beatNum = int.Parse(parts[3]);
+                beatSubdiv = int.Parse(parts[4]);
+                beatSubdivIdx = int.Parse(parts[5]);
             } else {
                 playTime = double.Parse(parts[3]);
             }
 
             foreach (int notePos in notePositions) {
-                InstantiateNoteEvent(chart, eventType, notePos, beatNum, playTime);
+                ChartEvent chartEvent; // Each notePos is still a unique chartEvent.
+                if (isByBeat) {
+                    chartEvent = new ChartEvent(chart, eventType, (int) beatNum, (int) beatSubdiv, (int) beatSubdivIdx);
+                } else {
+                    chartEvent = new ChartEvent(chart, eventType, (double) playTime);
+                }
+
+                InstantiateNoteEvent(chart, chartEvent, notePos);
             }
         } else if (eventType == ChartEvent.Types.BPMChange) {
             throw new Exception("Unimplemented");
@@ -113,14 +128,9 @@ public class ChartReader {
         }
     }
 
-    private void InstantiateNoteEvent(Chart chart, ChartEvent.Types eventType, int notePos, int? beatNum, double? playTime) {
-        ChartEvent chartEvent = new ChartEvent(chart, eventType, beatNum, playTime);
-        if (eventType == ChartEvent.Types.Note) {
-            chartEvent.InitializeNote(notePos);
-        } else {
-            throw new Exception("Unimplemented exception");
-        }
-
+    private void InstantiateNoteEvent(Chart chart, ChartEvent chartEvent, int notePos) {
+        chartEvent.InitializeNote(notePos);
         chart.AddChartEvent(chartEvent);
+        Debug.Log($"Instantiated note event: {chartEvent.ToString()}");
     }
 }
