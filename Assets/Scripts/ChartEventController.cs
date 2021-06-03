@@ -27,6 +27,10 @@ public class ChartEventController : MonoBehaviour {
             $"Initializing ChartEventController with: targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}");
     }
 
+    public double TimeFromTarget() {
+        return Math.Abs(ReferenceManager.AudioManager.CurrTrackTime - targetTime);
+    }
+
     public new string ToString() {
         return $"ChartEventController[targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}]";
     }
@@ -46,6 +50,12 @@ public class ChartEventController : MonoBehaviour {
         return transform.position.z <= minZPos;
     }
 
+    protected float CalculateZPos(double percentToPlayTime) {
+        int sign = percentToPlayTime >= 0.0 ? +1 : -1;
+        float distPercent = (float) Math.Pow(Math.Abs(percentToPlayTime), 1.25);
+        return sign * spawnZOffset * distPercent; // spawnZOffset being a float means we can convert down to a float cuz least accurate
+    }
+
     protected void UpdatePosition() {
         // TODO: Make movement non-linear? Eg, move faster the farther away note is from judgement line. Maffs.
         if (ReferenceManager.AudioManager.IsPlayingTrack) {
@@ -55,9 +65,11 @@ public class ChartEventController : MonoBehaviour {
 
             double now = ReferenceManager.AudioManager.CurrTrackTime;
             double timeToPlayTime = now - spawnedTime;
-            double percentToPlayTime = timeToPlayTime / (targetTime - spawnedTime);
 
-            float zPos = spawnZOffset * (float) (1 - percentToPlayTime);
+            double percentToPlayTime = 1 - timeToPlayTime / (targetTime - spawnedTime);
+
+            float zPos = CalculateZPos(percentToPlayTime);
+            //Debug.Log($"Calculated zPos update to be: {zPos} - percentToPlayTime:{percentToPlayTime}");
 
             Vector3 newPos = new Vector3(transform.position.x, transform.position.y, zPos);
             // Debug.Log($"Moving note {this} to newPos: {newPos} with zPos:{zPos}, pcntToPlayTime:{percentToPlayTime}, timeToPlayTime:{timeToPlayTime}, spawnedTime:{spawnedTime}, targetTime:{targetTime}, spawnZOffset:{spawnZOffset}");

@@ -145,20 +145,27 @@ public class NotesManager : MonoBehaviour {
         return notePosToKeyCodeMapping.IndexOf(key);
     }
 
+    private const double MinPerfectJudgementDelta = 0.02; // seconds
+    private const double MinGoodJudgementDelta = 0.075; // seconds
     void JudgeHit(NoteController note) {
         Debug.Log($"Registering hit at: beat:{AudioManager.ConvertTimeToBeatAsDouble(ReferenceManager.AudioManager.CurrTrackTime, ReferenceManager.GameplayManager.CurrChart.BPM)}, time:{ReferenceManager.AudioManager.CurrTrackTime}");
         AudioManager.PlayHitSound();
 
-        // TODO: Make timing based, not distance based
-        float distToCenter = Math.Abs(note.transform.position.z);
-        if (distToCenter <= 0.25f) {
+        double beatDuration = 60.0 / ReferenceManager.GameplayManager.CurrChart.CurrBPM();
+        double timingDelta = note.TimeFromTarget();
+
+        double perfectDelta = Math.Min(beatDuration * 0.05, MinPerfectJudgementDelta);
+        double goodDelta = Math.Min(beatDuration * 0.15, MinGoodJudgementDelta);
+
+        if (timingDelta <= perfectDelta) {
             note.RegisterHitPerfect();
         }
-        else if (distToCenter <= 0.75f) {
+        else if (timingDelta <= goodDelta) {
             note.RegisterHitGood();
         }
         else {
             note.RegisterHitMiss();
         }
+        Debug.Log($"Judging note hit: timingDelta:{timingDelta}, beatDuration:{beatDuration}");
     }
 }
