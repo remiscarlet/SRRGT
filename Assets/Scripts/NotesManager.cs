@@ -7,10 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NotesManager : MonoBehaviour {
-    private float boardWidth = 10.0f;
     private int numKeys = 7;
-
-    private int spawnDistance = 30; // TODO: Need to tie this and NoteController fall speed together with audio manager
 
     private List<KeyCode> notePosToKeyCodeMapping;
     private List<Vector3> noteSpawnPositions;
@@ -48,13 +45,13 @@ public class NotesManager : MonoBehaviour {
     }
 
     void CalculateSpawnPositions() {
-        float xOffset = boardWidth / -2.0f;
-        float noteWidth = boardWidth / numKeys;
+        float xOffset = (float) BoardManager.BoardWidth / -2.0f;
+        float noteWidth = (float) BoardManager.BoardWidth / numKeys;
 
         noteSpawnPositions = new List<Vector3>();
 
         for (int i = 0; i < numKeys; i++) {
-            noteSpawnPositions.Add(new Vector3(xOffset + (i + 0.5f) * noteWidth, 0, spawnDistance));
+            noteSpawnPositions.Add(new Vector3(xOffset + (i + 0.5f) * noteWidth, 0, BoardManager.ChartEventSpawnDistance));
         }
     }
 

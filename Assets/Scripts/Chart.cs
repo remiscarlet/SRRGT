@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,7 @@ public class Chart {
     public int NumKeys { get; private set; }
     public int BPM { get; private set; }
     public double LeadOffset { get; private set; } // Offset of first beat in music
-    public double NoteLeadDurationInSec { get; private set; } // Duration of time before music starts. Ie, gives time for first chartevent lead in. In future have speed modifiers modify in get;
+    public double NoteLeadDurationInSec { get; private set; } // Duration of time before music starts
 
     private AudioManager audioManager;
 
@@ -32,6 +33,20 @@ public class Chart {
         ChartEvent initialBPM = new ChartEvent(this, ChartEvent.Types.BPMChange, 1);
         initialBPM.InitializeBPMChange(bpm);
         BPMChanges.Add(initialBPM);
+    }
+
+    public int CurrBPM() {
+        if (BPMChanges.Count == 1) {
+            return BPMChanges[0].BPM;
+        }
+
+        foreach (ChartEvent bpmChange in BPMChanges) {
+            if (bpmChange.Beat.PlayTime <= ReferenceManager.AudioManager.CurrTrackTime) {
+                return bpmChange.BPM;
+            }
+        }
+
+        throw new Exception("Huh!? Could not find a valid bpm...?");
     }
 
     public void PlayChart() {

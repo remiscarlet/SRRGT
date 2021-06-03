@@ -80,6 +80,10 @@ public class AudioManager : MonoBehaviour {
             lastTrackSnapshot = -1.0;
         }
 
+        // This is kind of ugly. Probably refactor eventually.
+        // IsPlayingTrack is true when the gameplay "starts" including with the lead in time.
+        // trackAudioSource.isPlaying is only true at the point CurrTrackTime >= 0.0.
+        // In other words, IsPlayingTrack != trackAudioSource.isPlaying iff CurrTrackTime < 0.0
         if (IsPlayingTrack) {
             if (CurrTrackTime >= 0.0 && ! trackAudioSource.isPlaying) {
                 // To account for lead time. How to make cleaner?

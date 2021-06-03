@@ -257,6 +257,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 21574814}
   m_CullTransparentMesh: 1
+--- !u!1 &158832426
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 158832427}
+  m_Layer: 0
+  m_Name: BeatLines
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &158832427
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 158832426}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &208726799
 GameObject:
   m_ObjectHideFlags: 0
@@ -321,7 +351,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &298508321
 GameObject:
@@ -1602,7 +1632,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 100
-  field of view: 68.6
+  field of view: 58.1
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1627,13 +1657,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.1806852, y: -0, z: -0, w: 0.983541}
-  m_LocalPosition: {x: 0, y: 3.85, z: -3.89}
+  m_LocalRotation: {x: 0.30060452, y: -0, z: -0, w: 0.95374894}
+  m_LocalPosition: {x: 0, y: 6.123, z: -5.206}
   m_LocalScale: {x: 1, y: 0.9524, z: 1.4823}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 20.819, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 34.988, y: 0, z: 0}
 --- !u!1 &997647722
 GameObject:
   m_ObjectHideFlags: 0
@@ -2785,6 +2815,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   noteObject: {fileID: 2965356165611906423, guid: 5eb1e9c60fbd0e14fa12c0594d1f550a, type: 3}
+  beatLineObject: {fileID: 2215309265858496994, guid: cd3f8fdf36e80b84e9695c239d6d0006, type: 3}
   noteBoundaryLine: {fileID: 7852744020650566041, guid: bed445556b5fdcc489b9c0f834a973c6, type: 3}
   accuracyMissText: {fileID: 1755054120424495765, guid: 321f85769a824f34b8a067a53e4ff263, type: 3}
   accuracyGoodText: {fileID: 6853403765881760333, guid: 60b2bfd11809a4447a83b657afa677ea, type: 3}
@@ -2898,7 +2929,7 @@ RectTransform:
   - {fileID: 2041089896}
   - {fileID: 453153018}
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}

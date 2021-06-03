@@ -12,6 +12,7 @@ using UnityEngine.EventSystems;
 /// </summary>
 public class PrefabManager : MonoBehaviour {
     public GameObject noteObject;
+    public GameObject beatLineObject;
 
     public GameObject noteBoundaryLine;
 
@@ -22,6 +23,9 @@ public class PrefabManager : MonoBehaviour {
 
     public GameObject NoteObject {
         get => noteObject;
+    }
+    public GameObject BeatLineObject {
+        get => beatLineObject;
     }
 
     public GameObject NoteBoundaryLine {

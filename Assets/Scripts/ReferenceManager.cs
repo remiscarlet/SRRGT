@@ -30,6 +30,7 @@ public class ReferenceManager : MonoBehaviour {
             case GameSceneManager.GameplayScene:
                 hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
                 notesHierarchyTransform = GameObject.Find("Notes").transform;
+                beatLinesHierarchyTransform = GameObject.Find("BeatLines").transform;
                 environmentHierarchyTransform = GameObject.Find("Environment").transform;
 
                 cameraObject = GameObject.Find("Main Camera");
@@ -53,6 +54,7 @@ public class ReferenceManager : MonoBehaviour {
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
     [System.NonSerialized] public Transform notesHierarchyTransform;
+    [System.NonSerialized] public Transform beatLinesHierarchyTransform;
     [System.NonSerialized] public Transform environmentHierarchyTransform;
 
     [System.NonSerialized] public GameObject cameraObject;
@@ -79,6 +81,9 @@ public class ReferenceManager : MonoBehaviour {
     }
     public static Transform NotesHierarchyTransform {
         get => instance.notesHierarchyTransform;
+    }
+    public static Transform BeatLinesHierarchyTransform {
+        get => instance.beatLinesHierarchyTransform;
     }
     public static Transform EnvironmentHierarchyTransform {
         get => instance.environmentHierarchyTransform;
