@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class GameSceneManager : MonoBehaviour {
     public const string MainMenuScene = "Main Menu";
     public const string GameplayScene = "Gameplay";
+    public const string EditorScene = "Editor";
 
     public LightingSettings lightingSettings;
 

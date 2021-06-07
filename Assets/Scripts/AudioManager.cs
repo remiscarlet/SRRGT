@@ -17,7 +17,8 @@ public class AudioManager : MonoBehaviour {
     private AudioSource bgmAudioSource; // "BGM" that isn't track music - ie menus
     private AudioSource trackAudioSource; // Track/Chart music for game
 
-    public double CurrTrackTime { private set; get; } = -2.0; // 2 second lead time. TODO: Make configurable
+    private const double defaultTrackStartTime = -2.0;
+    public double CurrTrackTime { private set; get; } = defaultTrackStartTime; // 2 second lead time. TODO: Make configurable
 
     private double lastTrackSnapshot = -1.0;
 
@@ -27,6 +28,7 @@ public class AudioManager : MonoBehaviour {
     public float volume = 0.3f;
 
     public static void PlayHitSound() {
+        // TODO: Account for multiple notes playing at same time causing additive volume? (Is louder with multistop notes)
         Debug.Log("+++");
         instance.sfxAudioSource.PlayOneShot(instance.hitSoundSFX, instance.volume);
     }
@@ -60,11 +62,21 @@ public class AudioManager : MonoBehaviour {
         if (!IsPlayingTrack && ReferenceManager.GameplayManager.CurrChart == null) {
             throw new Exception("Tried to toggle music state while CurrChart was null! Set CurrChart first. ");
         }
+
+        Debug.Log("Toggling AudioManager.ToggleTrackMusic");
         IsPlayingTrack = !IsPlayingTrack;
     }
 
     public float GetTrackPercentage() {
         return (float) CurrTrackTime / trackAudioSource.clip.length;
+    }
+
+    public void RestartTrack() {
+        CurrTrackTime = defaultTrackStartTime;
+    }
+
+    public void SeekTrack(double percent) {
+        CurrTrackTime = trackAudioSource.clip.length * percent;
     }
 
     void Update() {

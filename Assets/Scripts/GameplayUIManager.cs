@@ -10,7 +10,7 @@ public class GameplayUIManager : MonoBehaviour {
     private bool UIActive {
         get { return uiActive; }
         set {
-            loadingPanel.SetActive(value);
+            //loadingPanel.SetActive(value);
             statsPanel.SetActive(value);
             uiActive = value;
         }

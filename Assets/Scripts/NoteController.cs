@@ -5,7 +5,7 @@ using System.Net;
 using UnityEditor.UI;
 using UnityEngine;
 
-public class NoteController : ChartEventController {
+public class NoteController : Chart.EventController {
     private bool noteAlreadyMissed = false;
 
     public int Pos {

@@ -7,14 +7,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class NotesManager : MonoBehaviour {
-    private int numKeys = 7;
+    private int NumKeys {
+        get {
+            Chart.Chart currChart = ReferenceManager.GameplayManager.CurrChart;
+            if (currChart == null) {
+                throw new Exception("Tried to get NumKeys from currChart but currChart is null!");
+            }
 
-    private List<KeyCode> notePosToKeyCodeMapping;
+            return currChart.NumKeys;
+        }
+    }
+
+    public List<KeyCode> NotePosToKeyCodeMapping { private set; get; }
     private List<Vector3> noteSpawnPositions;
 
     private List<NoteController> spawnedNotes;
     // Start is called before the first frame update
-    void Start() {
+    private void Start() {
         spawnedNotes = new List<NoteController>();
         foreach (Transform note in ReferenceManager.NotesHierarchyTransform) {
             spawnedNotes.Add(note.gameObject.GetComponent<NoteController>());
@@ -24,33 +33,33 @@ public class NotesManager : MonoBehaviour {
         CalculateSpawnPositions();
     }
 
-    void CalculateNotePosToKeyCodes() {
+    private void CalculateNotePosToKeyCodes() {
         // TODO: Make more robust/input manager class
 
         List<KeyCode> keys;
 
-        if (numKeys == 4) {
+        if (NumKeys == 4) {
             keys = new List<KeyCode> { KeyCode.D, KeyCode.F, KeyCode.J, KeyCode.K };
-        } else if (numKeys == 5) {
+        } else if (NumKeys == 5) {
             keys = new List<KeyCode> { KeyCode.D, KeyCode.F, KeyCode.Space, KeyCode.J, KeyCode.K };
-        } else if (numKeys == 6) {
+        } else if (NumKeys == 6) {
             keys = new List<KeyCode> { KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.J, KeyCode.K, KeyCode.L };
-        } else if (numKeys == 7) {
+        } else if (NumKeys == 7) {
             keys = new List<KeyCode> { KeyCode.S, KeyCode.D, KeyCode.F, KeyCode.Space, KeyCode.J, KeyCode.K, KeyCode.L };
         } else {
             throw new Exception("Got invalid number of keys for initialization.");
         }
 
-        notePosToKeyCodeMapping = keys;
+        NotePosToKeyCodeMapping = keys;
     }
 
-    void CalculateSpawnPositions() {
+    private void CalculateSpawnPositions() {
         float xOffset = (float) BoardManager.BoardWidth / -2.0f;
-        float noteWidth = (float) BoardManager.BoardWidth / numKeys;
+        float noteWidth = (float) BoardManager.BoardWidth / NumKeys;
 
         noteSpawnPositions = new List<Vector3>();
 
-        for (int i = 0; i < numKeys; i++) {
+        for (int i = 0; i < NumKeys; i++) {
             noteSpawnPositions.Add(new Vector3(xOffset + (i + 0.5f) * noteWidth, 0, BoardManager.ChartEventSpawnDistance));
         }
     }
@@ -60,7 +69,7 @@ public class NotesManager : MonoBehaviour {
         Destroy(note.gameObject);
     }
 
-    List<NoteController> GetAllJudgeableNotesForPos(int notePos) {
+    private List<NoteController> GetAllJudgeableNotesForPos(int notePos) {
         return spawnedNotes.FindAll(note => note.gameObject.layer == Layers.JudgeableNotes && note.Pos == notePos);
     }
 
@@ -72,28 +81,27 @@ public class NotesManager : MonoBehaviour {
     /// <param name="notePos"></param>
     /// <returns></returns>
     [CanBeNull]
-    NoteController GetNextJudgeableNoteForPos(int notePos) {
+    private NoteController GetNextJudgeableNoteForPos(int notePos) {
         List<NoteController> notes = GetAllJudgeableNotesForPos(notePos);
-        if (notes.Count == 0) {
-            return null;
-        }
-
-        return notes[0];
+        return notes.Count == 0 ? null : notes[0];
     }
 
-    public void SpawnChartEvent(ChartEvent chartEvent) {
+    public void SpawnChartEvent(Chart.Event chartEvent) {
         SpawnNote(chartEvent.NotePos, chartEvent.Beat);
     }
 
     // Update is called once per frame
-    void Update() {
+    private void Update() {
         SpawnNotes();
-        ProcessInput();
+
+        if (ReferenceManager.AudioManager.IsPlayingTrack) {
+            ProcessInput();
+        }
     }
 
     private List<KeyCode> spawnButtons = new List<KeyCode> { KeyCode.Keypad0, KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3, KeyCode.Keypad4, KeyCode.Keypad5, KeyCode.Keypad6 };
     void SpawnNotes() {
-        for (int i = 0; i < numKeys; i++) {
+        for (int i = 0; i < NumKeys; i++) {
             KeyCode key = spawnButtons[i];
             if (Input.GetKeyDown(key)) {
                 SpawnNote(i, AudioSettings.dspTime + 0.5); // Hard code target time of "0.5 seconds later"
@@ -103,11 +111,12 @@ public class NotesManager : MonoBehaviour {
 
     private Quaternion fwdRotation = Quaternion.Euler(new Vector3(0, 0, 90));
 
-    void SpawnNote(int pos, ChartBeat beat) {
+    private void SpawnNote(int pos, Chart.Beat beat) {
         SpawnNote(pos, beat.PlayTime);
     }
 
-    void SpawnNote(int pos, double playTime) {
+    private void SpawnNote(int pos, double playTime) {
+        Debug.Log($"Spawning at pos `{pos}` and at time `{playTime}`");
         Vector3 position = noteSpawnPositions[pos];
         GameObject note = Instantiate(ReferenceManager.Prefabs.NoteObject, position, fwdRotation, ReferenceManager.NotesHierarchyTransform);
 
@@ -117,37 +126,37 @@ public class NotesManager : MonoBehaviour {
         spawnedNotes.Add(noteController);
     }
 
-    void ProcessInput() {
-        if (ReferenceManager.AudioManager.IsPlayingTrack) {
-            foreach (KeyCode key in notePosToKeyCodeMapping) {
-                if (Input.GetKeyDown(key)) {
-                    NoteController? note = GetNextJudgeableNoteForPos(KeyCodeToNotePos(key));
-                    if (note != null) {
-                        JudgeHit(note);
-                    }
-                }
+    private void ProcessInput() {
+        foreach (KeyCode key in NotePosToKeyCodeMapping) {
+            if (!Input.GetKeyDown(key)) {
+                continue;
+            }
+
+            NoteController? note = GetNextJudgeableNoteForPos(KeyCodeToNotePos(key));
+            if (note != null) {
+                JudgeHit(note);
             }
         }
     }
 
-    KeyCode NotePosToKeyCode(int notePos) {
-        if (notePos >= notePosToKeyCodeMapping.Count) {
+    private KeyCode NotePosToKeyCode(int notePos) {
+        if (notePos >= NotePosToKeyCodeMapping.Count) {
             throw new Exception($"Got notePos value greater than configured number of keys! Got: {notePos}");
         }
         Debug.Log($"Notepos is {notePos}");
-        return notePosToKeyCodeMapping[notePos];
+        return NotePosToKeyCodeMapping[notePos];
     }
 
-    int KeyCodeToNotePos(KeyCode key) {
-        if (!notePosToKeyCodeMapping.Contains(key)) {
+    private int KeyCodeToNotePos(KeyCode key) {
+        if (!NotePosToKeyCodeMapping.Contains(key)) {
             throw new Exception($"Tried to get notepos of invalid key. Got: {key}");
         }
-        return notePosToKeyCodeMapping.IndexOf(key);
+        return NotePosToKeyCodeMapping.IndexOf(key);
     }
 
     private const double MinPerfectJudgementDelta = 0.02; // seconds
     private const double MinGoodJudgementDelta = 0.075; // seconds
-    void JudgeHit(NoteController note) {
+    private void JudgeHit(NoteController note) {
         Debug.Log($"Registering hit at: beat:{AudioManager.ConvertTimeToBeatAsDouble(ReferenceManager.AudioManager.CurrTrackTime, ReferenceManager.GameplayManager.CurrChart.BPM)}, time:{ReferenceManager.AudioManager.CurrTrackTime}");
         AudioManager.PlayHitSound();
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -20,36 +21,48 @@ public class ReferenceManager : MonoBehaviour {
     void Awake() {
         instance = this;
 
+        bool isValidName = false;
         string sceneName = SceneManager.GetActiveScene().name;
-        switch (sceneName) {
-            case GameSceneManager.MainMenuScene:
-                mainMenuManager = GetComponent<MainMenuManager>();
-                gameSceneManager = GetComponent<GameSceneManager>();
-                mainMenuUiManager = GameObject.Find("Canvas").GetComponent<MainMenuUIManager>();
-                break;
-            case GameSceneManager.GameplayScene:
-                hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
-                notesHierarchyTransform = GameObject.Find("Notes").transform;
-                beatLinesHierarchyTransform = GameObject.Find("BeatLines").transform;
-                environmentHierarchyTransform = GameObject.Find("Environment").transform;
+        if (sceneName == GameSceneManager.MainMenuScene) {
+            mainMenuManager = GetComponent<MainMenuManager>();
+            gameSceneManager = GetComponent<GameSceneManager>();
+            mainMenuUiManager = GameObject.Find("Canvas").GetComponent<MainMenuUIManager>();
+            isValidName = true;
+        } else if (sceneName == GameSceneManager.EditorScene ||
+                   sceneName == GameSceneManager.GameplayScene) {
+            hitResultsHierarchyTransform = GameObject.Find("HitResults").transform;
+            notesHierarchyTransform = GameObject.Find("Notes").transform;
+            beatLinesHierarchyTransform = GameObject.Find("BeatLines").transform;
+            environmentHierarchyTransform = GameObject.Find("Environment").transform;
 
-                cameraObject = GameObject.Find("Main Camera");
-                hitPlaneOuterObject = environmentHierarchyTransform.Find("HitPlaneOuter").gameObject;
-                hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
-                hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
+            cameraObject = GameObject.Find("Main Camera");
+            hitPlaneOuterObject = environmentHierarchyTransform.Find("HitPlaneOuter").gameObject;
+            hitPlaneInnerObject = environmentHierarchyTransform.Find("HitPlaneInner").gameObject;
+            hitPlaneCenterObject = environmentHierarchyTransform.Find("HitPlaneCenter").gameObject;
 
-                gameplayManager = GetComponent<GameplayManager>();
-                gameSceneManager = GetComponent<GameSceneManager>();
-                prefabs = GetComponent<PrefabManager>();
-                notesManager = gameObject.GetComponent<NotesManager>();
-                scoreManager = GetComponent<ScoreManager>();
-                gameplayUiManager = GameObject.Find("Canvas").GetComponent<GameplayUIManager>();
-                audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
-                boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
-                break;
-            default:
-                throw new Exception($"Got invalid scene name! Got: {sceneName}");
+            prefabs = GetComponent<PrefabManager>();
+            Debug.Log($">>> prefabs: {prefabs} - {prefabs.NoteBoundaryLine}");
+            notesManager = gameObject.GetComponent<NotesManager>();
+            scoreManager = GetComponent<ScoreManager>();
+            canvas = GameObject.Find("Canvas");
+            gameplayUiManager = canvas.GetComponent<GameplayUIManager>();
+            audioManager = GameObject.Find("AudioManager").GetComponent<AudioManager>();
+            boardManager = environmentHierarchyTransform.Find("Board").gameObject.GetComponent<BoardManager>();
+
+            gameplayManager = GetComponent<GameplayManager>();
+            gameSceneManager = GetComponent<GameSceneManager>();
+            isValidName = true;
         }
+
+        if (sceneName == GameSceneManager.EditorScene) {
+            editorManager = GetComponent<EditorManager>();
+            editorUiManager = canvas.GetComponent<EditorUIManager>();
+        }
+
+        if (!isValidName) {
+            throw new Exception($"Got invalid scene name! Got: {sceneName}");
+        }
+
     }
 
     [System.NonSerialized] public Transform hitResultsHierarchyTransform;
@@ -61,8 +74,11 @@ public class ReferenceManager : MonoBehaviour {
     [System.NonSerialized] public GameObject hitPlaneOuterObject;
     [System.NonSerialized] public GameObject hitPlaneInnerObject;
     [System.NonSerialized] public GameObject hitPlaneCenterObject;
+    [System.NonSerialized] public GameObject canvas;
 
     [System.NonSerialized] public GameplayManager gameplayManager;
+    [System.NonSerialized] public EditorManager editorManager;
+    [System.NonSerialized] public EditorUIManager editorUiManager;
     [System.NonSerialized] public MainMenuManager mainMenuManager;
     [System.NonSerialized] public GameSceneManager gameSceneManager;
     [System.NonSerialized] public PrefabManager prefabs;
@@ -110,6 +126,12 @@ public class ReferenceManager : MonoBehaviour {
     /// </summary>
     public static GameplayManager GameplayManager {
         get => instance.gameplayManager;
+    }
+    public static EditorManager EditorManager {
+        get => instance.editorManager;
+    }
+    public static EditorUIManager EditorUIManager {
+        get => instance.editorUiManager;
     }
     public static MainMenuManager MainMenuManager{
         get => instance.mainMenuManager;
