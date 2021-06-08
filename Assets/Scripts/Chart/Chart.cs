@@ -18,6 +18,22 @@ namespace Chart {
 
         private List<Event> chartEvents;
 
+        private List<Event> allChartEvents;
+
+        private List<Event> AllChartEvents {
+            get {
+                if (allChartEvents == null) {
+                    allChartEvents = chartEvents;
+                }
+
+                return allChartEvents;
+            }
+        }
+        public void InitializeExtraChartEvents(List<Event> extraChartEvents) {
+            allChartEvents = new List<Event>(chartEvents);
+            allChartEvents.AddRange(extraChartEvents);
+        }
+
         public List<Event> BPMChanges { private set; get; } // Should guarantee order by ascending beat
 
         public Chart(string title, string artist, int numKeys, int bpm, double leadOffset) {
@@ -53,54 +69,36 @@ namespace Chart {
         }
 
         public void PlayChart() {
-            List<Event> noExtraEvents = new List<Event>();
-            PlayChart(ref noExtraEvents);
-        }
-
-        public void PlayChart(ref List<Event> extraChartEvents) {
             double currTime = ReferenceManager.AudioManager.CurrTrackTime;
-
-            List<Event> events = chartEvents;
-            if (extraChartEvents.Count > 0) {
-                Debug.Log($"Adding extra chart events: {extraChartEvents} - {extraChartEvents.Count}");
-                events.AddRange(extraChartEvents);
-            }
 
             // TODO: God, this is so inefficient. Clean it up.
             List<Event> playedEvents = new List<Event>();
-            foreach (Event chartEvent in events) {
-                //Debug.Log($"BeatNum: {chartEvent.Beat.AsFloat()} - {LeadDuration} <= {currTime}");
+            foreach (Event chartEvent in AllChartEvents) {
+                if (chartEvent.Beat.PlayTime <= currTime) {
+                    // We're "too late" to play this note. Don't "play" it but add it to playedEvents to remove from list.
+                    // This happens when we seek to a new track position and re-initialize extraChartEvents
+                    playedEvents.Add(chartEvent);
+                    continue;
+                }
 
                 if (chartEvent.Beat.PlayTime - NoteLeadDurationInSec <= currTime) {
-                    //Debug.Log(
-                    //    $"Spawning chartEvent at `currTme:{currTime}` => {chartEvent.ToString()} - BPM:{BPM} - Target beat: {chartEvent.Beat.ToString()}");
                     ReferenceManager.NotesManager.SpawnChartEvent(chartEvent);
                     playedEvents.Add(chartEvent);
-                    //Debug.Log($"Spawned: {chartEvent}");
                 }
             }
 
+            /*
             chartEvents = chartEvents
                 .Where(chartEvent => !playedEvents.Any(playedEvent => playedEvent == chartEvent))
                 .ToList();
             extraChartEvents = extraChartEvents
                 .Where(chartEvent => !playedEvents.Any(playedEvent => playedEvent == chartEvent))
                 .ToList();
-            /*
-            foreach (Event playedEvent in playedEvents) {
-                Debug.Log($"Seeing where {playedEvent.ToString()} exists.");
-                chartEvents = chartEvents.Where(chartEvent => chartEvent != playedEvent).ToList();
-                extraChartEvents = extraChartEvents.Where(chartEvent => chartEvent != playedEvent).ToList();
-
-                if (chartEvents.Contains(chartEvent)) {
-                    Debug.Log("Here???");
-                    chartEvents.Remove(chartEvent);
-                } else if (extraChartEvents.Contains(chartEvent)) {
-                    Debug.Log($">>> Removing chartEvent {chartEvent}");
-                    extraChartEvents.Remove(chartEvent);
-                }
-            }
             */
+
+            foreach (Event playedEvent in playedEvents) {
+                allChartEvents.Remove(playedEvent);
+            }
         }
 
 

@@ -131,8 +131,8 @@ namespace Chart {
                 time += secsInBeat * beatsToCount;
             }
 
-            Debug.Log(
-                $"Calculated playtime from beat. Time:{time}, beat:{beatNum}, beatSubdiv:{beatSubdiv}, beatSubdivIdx:{beatSubdivIdx}");
+            //Debug.Log(
+            //    $"Calculated playtime from beat. Time:{time}, beat:{beatNum}, beatSubdiv:{beatSubdiv}, beatSubdivIdx:{beatSubdivIdx}");
             return time;
         }
     }
