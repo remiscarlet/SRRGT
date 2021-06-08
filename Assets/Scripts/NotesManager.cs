@@ -54,8 +54,8 @@ public class NotesManager : MonoBehaviour {
     }
 
     private void CalculateSpawnPositions() {
-        float xOffset = (float) BoardManager.BoardWidth / -2.0f;
-        float noteWidth = (float) BoardManager.BoardWidth / NumKeys;
+        float xOffset = BoardManager.BoardWidth / -2.0f;
+        float noteWidth = BoardManager.BoardWidth / NumKeys;
 
         noteSpawnPositions = new List<Vector3>();
 

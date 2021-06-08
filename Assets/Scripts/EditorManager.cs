@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class EditorManager : GameplayManager {
 
@@ -15,17 +16,8 @@ public class EditorManager : GameplayManager {
             audioManager.ToggleTrackMusic();
             ReferenceManager.EditorUIManager.ToggleEditorUI();
             isRecording = value;
-
-            if (!isRecording) {
-                InitializeRecordedEventsWithChart();
-            }
         }
         get { return isRecording; }
-    }
-
-    public void InitializeRecordedEventsWithChart() {
-        // TODO: Do we need to make a copy? Maybe not? Shared ref issues?
-        CurrChart.InitializeExtraChartEvents(new List<Chart.Event>(recordedChartEvents));
     }
 
     public void StartRecording() {
@@ -38,14 +30,26 @@ public class EditorManager : GameplayManager {
             audioManager.ToggleTrackMusic();
             isPlayingBack = value;
             if (value) {
+                Debug.Log("Restarting track via IsPlayingBack modification");
                 audioManager.RestartTrack();
+                InitializeRecordedEventsWithChart();
             }
         }
         get { return isPlayingBack; }
     }
 
+    public void InitializeRecordedEventsWithChart() {
+        // TODO: Do we need to make a copy? Maybe not? Shared ref issues?
+        CurrChart.InitializeExtraChartEvents(new List<Chart.Event>(recordedChartEvents));
+    }
+
+
     public void PlayRecording() {
+        Debug.Log("Executing PlayRecording()");
         IsPlayingBack = true;
+        // Because this func is a button onclick callback, the button is "focused" after clicking.
+        // This causes hitting KeyCode.Space to count as "clicking button". To avoid this, unfocus the gameObj
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     // Start is called before the first frame update
@@ -58,7 +62,6 @@ public class EditorManager : GameplayManager {
     // Update is called once per frame
     void Update() {
         if (IsRecording) {
-            Debug.Log("IsRecording: True");
             CurrChart.PlayChart();
             RecordNotes();
 
@@ -66,7 +69,6 @@ public class EditorManager : GameplayManager {
                 IsRecording = false;
             }
         } else if (IsPlayingBack) {
-            Debug.Log("IsPlayingBack: True");
             if (!IsPaused) {
                 CurrChart.PlayChart();
             }
@@ -90,8 +92,10 @@ public class EditorManager : GameplayManager {
         }
     }
 
+    private List<int> validSubdivs = new List<int>{1,2,3,4}; // TODO: Don't hardcode this.
     private void RecordNote(Chart.Event chartEvent) {
         Debug.Log($"Buffered new recorded note: {chartEvent} - {chartEvent.NotePos}, {chartEvent.Beat}");
+        chartEvent.Beat.ApproximateBeatFromPlayTime(validSubdivs);
         recordedChartEvents.Add(chartEvent);
     }
 }

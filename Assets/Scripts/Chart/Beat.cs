@@ -57,12 +57,7 @@ namespace Chart {
         }
 
         public string ToString() {
-            if (playTime == null) {
-                return $"Beat:{AsFloat()}";
-            }
-            else {
-                return $"Beat-playtime:{playTime}";
-            }
+            return (playTime == null) ? $"Beat:{AsFloat()}" : $"Beat-playtime:{playTime}";
         }
 
         /// <summary>
@@ -77,11 +72,11 @@ namespace Chart {
         /// <returns></returns>
         public double AsFloat() {
             if (beatSubdivIdx == 0) {
-                return (double) beatNum;
+                return beatNum;
             }
 
-            double beatPartial = (double) beatSubdivIdx / (double) beatSubdiv;
-            return (double) beatNum + beatPartial;
+            double beatPartial = (double) beatSubdivIdx / beatSubdiv;
+            return beatNum + beatPartial;
         }
 
         public bool Equals(Beat other) {
@@ -96,9 +91,69 @@ namespace Chart {
                    );
         }
 
-        public double GetPlayTimeFromBeat() {
+        private const double MinOffsetEpsilon = 0.05; // Any timing inaccuracy smaller than epsilon is ignored
+        public void ApproximateBeatFromPlayTime(List<int> validBeatSubdivs) {
+            if (playTime == null) {
+                throw new Exception("Cannot convert playtime to beat if playtime is null!");
+            }
+            int approxBeatNum, approxBeatSubdiv, approxBeatSubdivIdx;
+            double beatsCounted = 0;
             double time = 0.0;
-            double beatsCounted = 0; // Eh...? Feels like could pose bugs due to float accuracy.
+
+            int currBPM = -1;
+            foreach (Event bpmChange in chart.BPMChanges) {
+                // TODO: Sub metric tempo changes might screw with beatsCounted
+                if (currBPM == -1) {
+                    currBPM = bpmChange.BPM;
+                    continue;
+                }
+
+                if (bpmChange.Beat.AsFloat() > AsFloat()) {
+                    // The bpm change we're looking at is in the "future" relative to this ChartBeat.
+                    break;
+                }
+
+                double numBeatsWithBPM = Math.Min(AsFloat(), bpmChange.Beat.AsFloat()) - beatsCounted;
+                double secsInBeat = 60.0 / currBPM;
+                time += secsInBeat * numBeatsWithBPM;
+                beatsCounted += numBeatsWithBPM;
+                currBPM = bpmChange.BPM;
+            }
+
+            double remTime = (double) playTime - time;
+            if (remTime >= MinOffsetEpsilon) {
+                double secsPerBeat = 60.0 / currBPM; // TODO: Clean way to not repeat declaration?
+                double subdivDur;
+
+                List<KeyValuePair<int, double>> subdivDivisibility = new List<KeyValuePair<int, double>>();
+                foreach (int subdiv in validBeatSubdivs) {
+                    // Calculate the "divisibility" of each subdiv by checking how "far" from the subdiv beat
+                    // our remTime would be for each valid subdiv.
+                    subdivDur = secsPerBeat / subdiv;
+                    double subdivRemainder = remTime % subdivDur;
+                    subdivDivisibility.Add(new KeyValuePair<int, double>(subdiv, subdivRemainder));
+                }
+
+                int closestSubdiv = 1;
+                double offsetForClosestSubdiv = -1.0;
+                foreach (KeyValuePair<int, double> subdiv in subdivDivisibility) {
+                    if (offsetForClosestSubdiv == -1.0 || offsetForClosestSubdiv > subdiv.Value) {
+                        closestSubdiv = subdiv.Key;
+                        offsetForClosestSubdiv = subdiv.Value;
+                    }
+                }
+
+                subdivDur = secsPerBeat / closestSubdiv;
+                this.beatNum = (int) Math.Floor(beatsCounted);
+                this.beatSubdiv = closestSubdiv;
+                this.beatSubdivIdx = (closestSubdiv == 1) ? 1 : (int) Math.Round(remTime / subdivDur);
+                this.playTime = null;
+            }
+        }
+
+        private double GetPlayTimeFromBeat() {
+            double time = 0.0;
+            double beatsCounted = 0;
 
             int currBPM = -1;
             foreach (Event bpmChange in chart.BPMChanges) {

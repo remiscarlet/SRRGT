@@ -73,6 +73,7 @@ public class AudioManager : MonoBehaviour {
 
     public void RestartTrack() {
         CurrTrackTime = defaultTrackStartTime;
+        trackAudioSource.time = 0.0f;
     }
 
     public void SeekTrack(double percent) {
