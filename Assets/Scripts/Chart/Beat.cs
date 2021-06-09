@@ -38,11 +38,7 @@ namespace Chart {
 
         public Beat(Chart chart, double playTime) {
             this.chart = chart;
-            this.playTime = playTime;
-        }
-
-        public Beat(double playTime) {
-            this.playTime = playTime;
+            this.PlayTime = (playTime < 0.0) ? 0.0 : playTime;
         }
 
         public double PlayTime {
@@ -61,7 +57,7 @@ namespace Chart {
         }
 
         /// <summary>
-        /// Returns the beat as a float.
+        /// Returns the beat num as a float.
         ///
         /// 0-index. Not 1-index
         ///
@@ -81,13 +77,12 @@ namespace Chart {
 
         public bool Equals(Beat other) {
             return (
-                       this.playTime != null &&
-                       this.playTime == other.playTime
+                       this.PlayTime == other.playTime
                    ) ||
                    (
-                        this.beatNum == other.beatNum &&
-                        this.beatSubdiv == other.beatSubdiv &&
-                        this.beatSubdivIdx == other.beatSubdivIdx
+                       this.beatNum == other.beatNum &&
+                       this.beatSubdiv == other.beatSubdiv &&
+                       this.beatSubdivIdx == other.beatSubdivIdx
                    );
         }
 
@@ -96,34 +91,55 @@ namespace Chart {
             if (playTime == null) {
                 throw new Exception("Cannot convert playtime to beat if playtime is null!");
             }
+
+            if (chart.BPMChanges.Count == 0) {
+                throw new Exception("Chart must have at least one BPM event to denote the initial BPM.");
+            }
+
             int approxBeatNum, approxBeatSubdiv, approxBeatSubdivIdx;
-            double beatsCounted = 0;
+            double secsPerBeat = 0.0; // Eh...? Can cause divbyzero exceptions below but might be better than say -1.0?
+            double beatsCounted = 0.0;
             double time = 0.0;
 
+            double numBeatsWithBPM;
             int currBPM = -1;
             foreach (Event bpmChange in chart.BPMChanges) {
-                // TODO: Sub metric tempo changes might screw with beatsCounted
                 if (currBPM == -1) {
                     currBPM = bpmChange.BPM;
+                    if (chart.BPMChanges.Count == 1) {
+                        secsPerBeat = 60.0 / currBPM;
+                        numBeatsWithBPM = Math.Floor((double) playTime / secsPerBeat);
+                        time += secsPerBeat * numBeatsWithBPM;
+                        beatsCounted += numBeatsWithBPM;
+                        Debug.Log($"+++ Calculating one-bpmchange chart. playTime:{playTime}, numBeatsWithBPM:{numBeatsWithBPM}, secsPerBeat:{secsPerBeat}, time:{time}");
+                    }
+
                     continue;
                 }
 
                 if (bpmChange.Beat.AsFloat() > AsFloat()) {
-                    // The bpm change we're looking at is in the "future" relative to this ChartBeat.
+                    // The bpm change we're looking at is in the "future" relative to this Beat.
                     break;
                 }
 
-                double numBeatsWithBPM = Math.Min(AsFloat(), bpmChange.Beat.AsFloat()) - beatsCounted;
-                double secsInBeat = 60.0 / currBPM;
-                time += secsInBeat * numBeatsWithBPM;
+                numBeatsWithBPM = Math.Min(AsFloat(), bpmChange.Beat.AsFloat()) - beatsCounted;
+
+                secsPerBeat = 60.0 / currBPM;
+                time += secsPerBeat * numBeatsWithBPM;
                 beatsCounted += numBeatsWithBPM;
                 currBPM = bpmChange.BPM;
             }
 
+
             double remTime = (double) playTime - time;
-            if (remTime >= MinOffsetEpsilon) {
-                double secsPerBeat = 60.0 / currBPM; // TODO: Clean way to not repeat declaration?
+            Debug.Log($"BEAT APPROX MID CALC: beatsCounted:{beatsCounted}, time:{time}, remTime: {remTime}");
+            if (remTime < MinOffsetEpsilon) {
+                approxBeatNum = (int) Math.Round(beatsCounted);
+                approxBeatSubdiv = 1;
+                approxBeatSubdivIdx = 0;
+            } else {
                 double subdivDur;
+                secsPerBeat = 60.0 / currBPM;
 
                 List<KeyValuePair<int, double>> subdivDivisibility = new List<KeyValuePair<int, double>>();
                 foreach (int subdiv in validBeatSubdivs) {
@@ -137,18 +153,33 @@ namespace Chart {
                 int closestSubdiv = 1;
                 double offsetForClosestSubdiv = -1.0;
                 foreach (KeyValuePair<int, double> subdiv in subdivDivisibility) {
-                    if (offsetForClosestSubdiv == -1.0 || offsetForClosestSubdiv > subdiv.Value) {
+                    subdivDur = secsPerBeat / subdiv.Value;
+                    double subdivOffset = remTime - Math.Floor(remTime / subdiv.Value) * subdivDur;
+                    Debug.Log($"++ Calculating subdivOffset: remTime:{remTime} - Math.Floor(remTime:{remTime} / subdiv.Value:{subdiv.Value} * subdivDur:{subdivDur}) = {subdivOffset}");
+                    if (offsetForClosestSubdiv == -1.0 || offsetForClosestSubdiv > subdivOffset) {
                         closestSubdiv = subdiv.Key;
-                        offsetForClosestSubdiv = subdiv.Value;
+                        offsetForClosestSubdiv = subdivOffset;
+
+                        Debug.Log($"Calculated offset for subdiv:{subdiv.Key} as offset:{subdivOffset}");
+                        if (offsetForClosestSubdiv < MinOffsetEpsilon) {
+                            // TODO: Noooo bad breaks. Refactor.
+                            break;
+                        }
                     }
                 }
 
                 subdivDur = secsPerBeat / closestSubdiv;
-                this.beatNum = (int) Math.Floor(beatsCounted);
-                this.beatSubdiv = closestSubdiv;
-                this.beatSubdivIdx = (closestSubdiv == 1) ? 1 : (int) Math.Round(remTime / subdivDur);
-                this.playTime = null;
+                // TODO: Submetric bpm changes will get screwy with this Floor().
+                approxBeatNum = (int) Math.Floor(beatsCounted);
+                approxBeatSubdiv = closestSubdiv;
+                approxBeatSubdivIdx = (closestSubdiv == 1) ? 0 : (int) Math.Round(remTime / subdivDur) - 1;
             }
+
+            Debug.Log($"APPROXIMATING BEAT: Playtime: {playTime} - APPROX-BEATNUM:{approxBeatNum}, SUBDIV:{approxBeatSubdiv}, IDX:{approxBeatSubdivIdx}");
+            this.beatNum = approxBeatNum;
+            this.beatSubdiv = approxBeatSubdiv;
+            this.beatSubdivIdx = approxBeatSubdivIdx;
+            this.playTime = null;
         }
 
         private double GetPlayTimeFromBeat() {

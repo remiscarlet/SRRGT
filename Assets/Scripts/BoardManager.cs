@@ -73,4 +73,9 @@ public class BoardManager : MonoBehaviour {
             currBeat += 1;
         }
     }
+
+    public void ResetBeatLines() {
+        currBeat = 0;
+        nextBeatLineBeat = null;
+    }
 }

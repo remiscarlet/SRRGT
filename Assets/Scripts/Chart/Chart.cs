@@ -68,6 +68,12 @@ namespace Chart {
             throw new Exception("Huh!? Could not find a valid bpm...?");
         }
 
+        /// <summary>
+        /// Should be called from Update().
+        ///
+        /// Will spawn any Chart.Events as they become temporally relevant.
+        /// </summary>
+        /// <returns></returns>
         public void PlayChart() {
             double currTime = ReferenceManager.AudioManager.CurrTrackTime;
 
@@ -86,15 +92,6 @@ namespace Chart {
                     playedEvents.Add(chartEvent);
                 }
             }
-
-            /*
-            chartEvents = chartEvents
-                .Where(chartEvent => !playedEvents.Any(playedEvent => playedEvent == chartEvent))
-                .ToList();
-            extraChartEvents = extraChartEvents
-                .Where(chartEvent => !playedEvents.Any(playedEvent => playedEvent == chartEvent))
-                .ToList();
-            */
 
             foreach (Event playedEvent in playedEvents) {
                 allChartEvents.Remove(playedEvent);

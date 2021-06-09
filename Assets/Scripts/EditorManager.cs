@@ -33,6 +33,7 @@ public class EditorManager : GameplayManager {
                 Debug.Log("Restarting track via IsPlayingBack modification");
                 audioManager.RestartTrack();
                 InitializeRecordedEventsWithChart();
+                ReferenceManager.BoardManager.ResetBeatLines();
             }
         }
         get { return isPlayingBack; }
@@ -92,10 +93,11 @@ public class EditorManager : GameplayManager {
         }
     }
 
-    private List<int> validSubdivs = new List<int>{1,2,3,4}; // TODO: Don't hardcode this.
+    private List<int> validSubdivs = new List<int>{1,2,4}; // TODO: Don't hardcode this.
     private void RecordNote(Chart.Event chartEvent) {
-        Debug.Log($"Buffered new recorded note: {chartEvent} - {chartEvent.NotePos}, {chartEvent.Beat}");
+        double playTime = chartEvent.Beat.PlayTime;
         chartEvent.Beat.ApproximateBeatFromPlayTime(validSubdivs);
+        Debug.Log($"Buffered new recorded note: notePos:{chartEvent.NotePos}, playTime:{playTime}, Beat:{chartEvent.Beat.ToString()}");
         recordedChartEvents.Add(chartEvent);
     }
 }

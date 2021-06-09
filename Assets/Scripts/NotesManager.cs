@@ -116,7 +116,7 @@ public class NotesManager : MonoBehaviour {
     }
 
     private void SpawnNote(int pos, double playTime) {
-        Debug.Log($"Spawning at pos `{pos}` and at time `{playTime}`");
+        //Debug.Log($"Spawning at pos `{pos}` and at time `{playTime}`");
         Vector3 position = noteSpawnPositions[pos];
         GameObject note = Instantiate(ReferenceManager.Prefabs.NoteObject, position, fwdRotation, ReferenceManager.NotesHierarchyTransform);
 
