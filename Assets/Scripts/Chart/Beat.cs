@@ -86,7 +86,7 @@ namespace Chart {
                    );
         }
 
-        private const double MinOffsetEpsilon = 0.05; // Any timing inaccuracy smaller than epsilon is ignored
+        private const double MinOffsetEpsilonPercent = 0.25; // Any timing inaccuracy smaller than epsilon*subdivdur is ignored
         public void ApproximateBeatFromPlayTime(List<int> validBeatSubdivs) {
             if (playTime == null) {
                 throw new Exception("Cannot convert playtime to beat if playtime is null!");
@@ -95,6 +95,9 @@ namespace Chart {
             if (chart.BPMChanges.Count == 0) {
                 throw new Exception("Chart must have at least one BPM event to denote the initial BPM.");
             }
+
+            Debug.Log("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            Debug.Log("++++++++++++++++++++++++++++++++++++++++++++++++++++");
 
             int approxBeatNum, approxBeatSubdiv, approxBeatSubdivIdx;
             double secsPerBeat = 0.0; // Eh...? Can cause divbyzero exceptions below but might be better than say -1.0?
@@ -133,7 +136,7 @@ namespace Chart {
 
             double remTime = (double) playTime - time;
             Debug.Log($"BEAT APPROX MID CALC: beatsCounted:{beatsCounted}, time:{time}, remTime: {remTime}");
-            if (remTime < MinOffsetEpsilon) {
+            if (remTime < MinOffsetEpsilonPercent * secsPerBeat) {
                 approxBeatNum = (int) Math.Round(beatsCounted);
                 approxBeatSubdiv = 1;
                 approxBeatSubdivIdx = 0;
@@ -148,21 +151,23 @@ namespace Chart {
                     subdivDur = secsPerBeat / subdiv;
                     double subdivRemainder = remTime % subdivDur;
                     subdivDivisibility.Add(new KeyValuePair<int, double>(subdiv, subdivRemainder));
+                    Debug.Log($"Subdiv:{subdiv}, subdivDur:{subdivDur}, subdivRemainder:{subdivRemainder} - remTime:{remTime}, secsPerBeat:{secsPerBeat}");
                 }
 
                 int closestSubdiv = 1;
                 double offsetForClosestSubdiv = -1.0;
-                foreach (KeyValuePair<int, double> subdiv in subdivDivisibility) {
-                    subdivDur = secsPerBeat / subdiv.Value;
-                    double subdivOffset = remTime - Math.Floor(remTime / subdiv.Value) * subdivDur;
-                    Debug.Log($"++ Calculating subdivOffset: remTime:{remTime} - Math.Floor(remTime:{remTime} / subdiv.Value:{subdiv.Value} * subdivDur:{subdivDur}) = {subdivOffset}");
+                foreach (KeyValuePair<int, double> subdivData in subdivDivisibility) {
+                    int subdiv = subdivData.Key;
+                    double subdivOffset = subdivData.Value;
+                    subdivDur = secsPerBeat / subdiv;
+
                     if (offsetForClosestSubdiv == -1.0 || offsetForClosestSubdiv > subdivOffset) {
-                        closestSubdiv = subdiv.Key;
+                        closestSubdiv = subdiv;
                         offsetForClosestSubdiv = subdivOffset;
 
-                        Debug.Log($"Calculated offset for subdiv:{subdiv.Key} as offset:{subdivOffset}");
-                        if (offsetForClosestSubdiv < MinOffsetEpsilon) {
-                            // TODO: Noooo bad breaks. Refactor.
+                        if (0.0 < offsetForClosestSubdiv && offsetForClosestSubdiv < MinOffsetEpsilonPercent * subdivDur) {
+                            // If less than zero, subdiv is "in the future". Eg, subdiv is the 'and' of the beat but the true timing is the 'e' of the beat.
+                            Debug.Log($"Calculated offset for subdiv:{subdiv} as offset:{subdivOffset} which was under min:{MinOffsetEpsilonPercent*subdivDur}");
                             break;
                         }
                     }
@@ -172,7 +177,9 @@ namespace Chart {
                 // TODO: Submetric bpm changes will get screwy with this Floor().
                 approxBeatNum = (int) Math.Floor(beatsCounted);
                 approxBeatSubdiv = closestSubdiv;
-                approxBeatSubdivIdx = (closestSubdiv == 1) ? 0 : (int) Math.Round(remTime / subdivDur) - 1;
+                approxBeatSubdivIdx = (closestSubdiv == 1) ? 0 : (int) Math.Round(remTime / subdivDur);
+                Debug.Log($"Subdiv:{approxBeatSubdiv}, subdivIdx: Math.Round(remTime:{remTime} / subdivDur:{subdivDur})");
+                // TODO: Can get things like "subdiv:4, subdivIdx:2" which is equiv to "subdiv:2, idx:1". Should simplify where possible.
             }
 
             Debug.Log($"APPROXIMATING BEAT: Playtime: {playTime} - APPROX-BEATNUM:{approxBeatNum}, SUBDIV:{approxBeatSubdiv}, IDX:{approxBeatSubdivIdx}");
