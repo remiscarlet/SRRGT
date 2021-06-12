@@ -112,10 +112,10 @@ public class NotesManager : MonoBehaviour {
     private Quaternion fwdRotation = Quaternion.Euler(new Vector3(0, 0, 90));
 
     private void SpawnNote(int pos, Chart.Beat beat) {
-        SpawnNote(pos, beat.PlayTime);
+        SpawnNote(pos, beat.PlayTime, beat.OrigPlayTime != null);
     }
 
-    private void SpawnNote(int pos, double playTime) {
+    private void SpawnNote(int pos, double playTime, bool isApproximated = false) {
         //Debug.Log($"Spawning at pos `{pos}` and at time `{playTime}`");
         Vector3 position = noteSpawnPositions[pos];
         GameObject note = Instantiate(ReferenceManager.Prefabs.NoteObject, position, fwdRotation, ReferenceManager.NotesHierarchyTransform);
@@ -123,6 +123,9 @@ public class NotesManager : MonoBehaviour {
         NoteController noteController = note.GetComponent<NoteController>();
         noteController.Pos = pos;
         noteController.InitializeTargetTime(playTime);
+        if (isApproximated) {
+            noteController.InitializeApproximatedNote();
+        }
         spawnedNotes.Add(noteController);
     }
 

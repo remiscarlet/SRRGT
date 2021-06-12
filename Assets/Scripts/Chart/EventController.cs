@@ -11,7 +11,7 @@ namespace Chart {
         protected NotesManager NotesManager;
 
         // Start is called before the first frame update
-        void Start() {
+        protected void Start() {
             ScoreManager = ReferenceManager.ScoreManager;
             NotesManager = ReferenceManager.NotesManager;
         }

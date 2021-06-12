@@ -86,6 +86,7 @@ public class EditorManager : GameplayManager {
         for (int notePos = 0; notePos < notes.Count; notePos++) {
             KeyCode key = notes[notePos];
             if (Input.GetKeyDown(key)) {
+                AudioManager.PlayHitSound();
                 Chart.Event chartEvent = new Chart.Event(CurrChart, Chart.Event.Types.Note, ReferenceManager.AudioManager.CurrTrackTime);
                 chartEvent.InitializeNote(notePos);
                 RecordNote(chartEvent);

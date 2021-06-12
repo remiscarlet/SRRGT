@@ -29,7 +29,7 @@ public class AudioManager : MonoBehaviour {
 
     public static void PlayHitSound() {
         // TODO: Account for multiple notes playing at same time causing additive volume? (Is louder with multistop notes)
-        Debug.Log("+++");
+        Debug.Log("+++ Jingle Jangle - Playing Hit Sound +++");
         instance.sfxAudioSource.PlayOneShot(instance.hitSoundSFX, instance.volume);
     }
 

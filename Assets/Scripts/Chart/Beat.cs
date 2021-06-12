@@ -24,6 +24,11 @@ namespace Chart {
         private Chart chart;
         private double? playTime;
 
+        public double? OrigPlayTime { // Only set if ApproximateBeatFromPlayTime() is called AND we are able to approximate with confidence
+            private set;
+            get;
+        }
+
         public Beat(Chart chart, int beatNum, int beatSubdiv, int beatSubdivIdx) {
             if (beatSubdivIdx > beatSubdiv) {
                 throw new Exception(
@@ -156,6 +161,7 @@ namespace Chart {
 
                 int closestSubdiv = 1;
                 double offsetForClosestSubdiv = -1.0;
+                bool wasApproximated = false;
                 foreach (KeyValuePair<int, double> subdivData in subdivDivisibility) {
                     int subdiv = subdivData.Key;
                     double subdivOffset = subdivData.Value;
@@ -167,10 +173,17 @@ namespace Chart {
 
                         if (0.0 < offsetForClosestSubdiv && offsetForClosestSubdiv < MinOffsetEpsilonPercent * subdivDur) {
                             // If less than zero, subdiv is "in the future". Eg, subdiv is the 'and' of the beat but the true timing is the 'e' of the beat.
-                            Debug.Log($"Calculated offset for subdiv:{subdiv} as offset:{subdivOffset} which was under min:{MinOffsetEpsilonPercent*subdivDur}");
+                            Debug.Log($"Calculated offset for subdiv:{subdiv} as offset:{subdivOffset} which was under min:{MinOffsetEpsilonPercent * subdivDur}");
+                            wasApproximated = true;
                             break;
                         }
                     }
+                }
+
+                if (!wasApproximated) {
+                    // We don't have particularly high confidence that our approximation is correct. Don't approximate.
+                    Debug.Log("##### COULD NOT APPROXIMATE BEAT. ABORTING.");
+                    return;
                 }
 
                 subdivDur = secsPerBeat / closestSubdiv;
@@ -178,7 +191,7 @@ namespace Chart {
                 approxBeatNum = (int) Math.Floor(beatsCounted);
                 approxBeatSubdiv = closestSubdiv;
                 approxBeatSubdivIdx = (closestSubdiv == 1) ? 0 : (int) Math.Round(remTime / subdivDur);
-                Debug.Log($"Subdiv:{approxBeatSubdiv}, subdivIdx: Math.Round(remTime:{remTime} / subdivDur:{subdivDur})");
+                Debug.Log($"Approximated vals... Subdiv:{approxBeatSubdiv}, subdivIdx: Math.Round(remTime:{remTime} / subdivDur:{subdivDur})");
                 // TODO: Can get things like "subdiv:4, subdivIdx:2" which is equiv to "subdiv:2, idx:1". Should simplify where possible.
             }
 
@@ -186,6 +199,7 @@ namespace Chart {
             this.beatNum = approxBeatNum;
             this.beatSubdiv = approxBeatSubdiv;
             this.beatSubdivIdx = approxBeatSubdivIdx;
+            this.OrigPlayTime = this.playTime;
             this.playTime = null;
         }
 

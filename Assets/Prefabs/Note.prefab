@@ -207,3 +207,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minZPos: -3
+  approximatedNoteMaterial: {fileID: 2100000, guid: 71b1cc0bd546c3f4eabc7fbdf17d2955, type: 2}

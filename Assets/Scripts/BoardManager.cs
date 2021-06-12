@@ -29,8 +29,6 @@ public class BoardManager : MonoBehaviour {
         for (int idx = 0; idx < numKeys + 1; idx++) {
             // Num boundaries = numKeys + 1. For far right boundary.
             position = new Vector3(idx * rowWidth, 0.0f, 0.0f);
-            Debug.Log(ReferenceManager.Prefabs);
-            Debug.Log(ReferenceManager.Prefabs.NoteBoundaryLine);
             GameObject boundary = Instantiate(noteBoundaryPrefab, position, noteBoundaryRot, environmentHierarchyTransform);
 
             boundaries.Add(boundary);

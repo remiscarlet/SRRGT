@@ -13,6 +13,19 @@ public class NoteController : Chart.EventController {
         set;
     } = 0;
 
+
+    private MeshRenderer noteMesh;
+    public Material approximatedNoteMaterial;
+
+    private void Awake() {
+        noteMesh = GetComponent<MeshRenderer>();
+        Debug.Log(($"Setting noteMesh:{noteMesh}"));
+    }
+
+    public void InitializeApproximatedNote() {
+        noteMesh.material = approximatedNoteMaterial;
+    }
+
     public new string ToString() {
         return $"NoteController[targetTime:{targetTime}, spawnedTime:{spawnedTime}, spawnZOffset:{spawnZOffset}]";
     }
